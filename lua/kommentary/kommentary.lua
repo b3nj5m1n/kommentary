@@ -162,17 +162,13 @@ normal code, but remove one *level* of commenting instead.
 @see comment_out_line
 ]]
 local function comment_out_range(line_number_start, line_number_end, comment_string)
-    -- TODO: Will fail when trying to outcomment multiple single-line comments
-    -- in a language that actually supports multi-line comments
+    -- TODO: Will fail when trying to comment out a single line commented out
+    -- with multi-line pre- and suffix
     line_number_start = line_number_start-1
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
-    if comment_string == false then
-        -- The language doesn't support multi-line comments, just loop over
-        -- each line and comment it out with a single-line comment
-        for line_number = line_number_start+1, line_number_end, 1 do
-            comment_out_line(line_number, config.get_single(0))
-        end
-    else
+    -- If the range consists of multiple single-line comments
+    local single_comments_array = comment_string == false
+    if not comment_string == false then
         if is_comment_multi(content, comment_string) then
             local result = {}
             for i, line in ipairs(content) do
@@ -188,6 +184,16 @@ local function comment_out_range(line_number_start, line_number_end, comment_str
                 result[i] = new_line
             end
             vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
+        else
+            single_comments_array = true
+        end
+    end
+    if single_comments_array then
+        -- The language doesn't support multi-line comments, or the
+        -- range just doesn't use them, either way: loop over each
+        -- line and comment it out with a single-line comment
+        for line_number = line_number_start+1, line_number_end, 1 do
+            comment_out_line(line_number, config.get_single(0))
         end
     end
 end
