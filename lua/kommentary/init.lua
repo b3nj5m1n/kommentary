@@ -1,7 +1,9 @@
 local config = require("kommentary.config")
+local kommentary = require("kommentary.kommentary")
 
 local function toggle_comment()
-    print "Not yet implemented."
+    local row = vim.api.nvim_win_get_cursor(0)[1]
+    kommentary.toggle_comment_line(row)
 end
 
 local function test()

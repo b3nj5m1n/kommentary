@@ -6,8 +6,8 @@ for a multi-line comment and the second field is the suffix. Note that the very
 first field can also be false, if a language always requires a pre- and suffix.
 ]]
 local config_table = {
-    ["lua"] = {"--", {"--[[", "]]"}},
-    ["markdown"] = {false, {"<!---", "-->"}},
+    ["lua"] = {"-- ", {"--[[ ", " ]]"}},
+    ["markdown"] = {false, {"<!--- ", " -->"}},
 }
 
 local function get_single(filetype)
