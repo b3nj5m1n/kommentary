@@ -58,13 +58,13 @@ end
 
 local function comment_in_line(line_number, comment_string)
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
-    vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {util.insert_at_beginning(content, comment_string)})
+    vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {util.insert_at_beginning(content, comment_string .. " ")})
 end
 
 local function comment_out_line(line_number, comment_string)
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
     if is_comment_single(content, comment_string) then
-        local result, _ = string.gsub(content, util.escape_pattern(comment_string), "", 1)
+        local result, _ = string.gsub(content, util.escape_pattern(comment_string) .. "%s*", "", 1)
         vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {result})
     end
 end
@@ -81,17 +81,17 @@ local function comment_in_range(line_number_start, line_number_end, comment_stri
     else
         local result = {}
         if line_number_start == line_number_end then
-            result = {util.insert_at_beginning(content, comment_string[1]) .. comment_string[2]}
+            result = {util.insert_at_beginning(content, comment_string[1] .. " ") .. " " .. comment_string[2]}
         else
             result = {}
             for i, line in ipairs(content) do
                 if i == 1 then
-                    result[i] = util.insert_at_beginning(line, comment_string[1])
+                    result[i] = util.insert_at_beginning(line, comment_string[1] .. " ")
                 else
                     result[i] = line
                 end
             end
-            result[#result] = result[#result] .. comment_string[2]
+            result[#result] = result[#result] .. " " .. comment_string[2]
         end
         vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
     end
@@ -104,7 +104,7 @@ local function comment_out_range(line_number_start, line_number_end, comment_str
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     if comment_string == false then
         -- The language doesn't support multi-line comments, just loop over
-        -- each line and comment it in with a single-line comment
+        -- each line and comment it out with a single-line comment
         for line_number = line_number_start+1, line_number_end, 1 do
             comment_out_line(line_number, config.get_single(0))
         end
@@ -114,12 +114,12 @@ local function comment_out_range(line_number_start, line_number_end, comment_str
             for i, line in ipairs(content) do
                 local new_line = line
                 if i == 1 then
-                    new_line, _ = string.gsub(line, util.escape_pattern(comment_string[1]), "", 1)
+                    new_line, _ = string.gsub(line, util.escape_pattern(comment_string[1]) .. "%s*", "", 1)
                 end
                 if i == #content then
                     -- This will make sure that only the last occurence of the suffix is replaced
                     local start_index = util.index_last_occurence(line, comment_string[2])
-                    new_line, _ = util.gsub_from_index(line, util.escape_pattern(comment_string[2]), "", 1, start_index)
+                    new_line, _ = util.gsub_from_index(line, "%s*" .. util.escape_pattern(comment_string[2]), "", 1, start_index)
                 end
                 result[i] = new_line
             end

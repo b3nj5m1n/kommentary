@@ -28,7 +28,7 @@ Plug 'b3nj5m1n/kommentary'
 
 ### Configure unsupported language
 
-Replace rust with the filetype you want to configure, the first field in the table with the prefix for single-line comments (including whitespace) or false if the language doesn't support single-line comments, and the second field with a table containing the prefix and suffix for multi-line comments (including whitespace) or false if the language doesn't support multi-line comments.
+Replace rust with the filetype you want to configure, the first field in the table with the prefix for single-line comments (A whitespace character gets added by default after a prefix and before a suffix) or false if the language doesn't support single-line comments, and the second field with a table containing the prefix and suffix for multi-line comments (including whitespace) or false if the language doesn't support multi-line comments.
 ```lua
 require('kommentary.config').config["rust"] = {"// ", {"/* ", " */"}}
 ```

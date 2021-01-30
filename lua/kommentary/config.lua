@@ -1,4 +1,4 @@
-local default = {"// ", {"/* ", " */"}}
+local default = {"//", {"/*", "*/"}}
 
 --[[ Configuration for each filetype, the first field is the prefix for a single
 line comment, the second field is either false, if multi-line comments aren't
@@ -15,14 +15,14 @@ local config_table = {
     ["java"] = default,
     ["javascript"] = default,
     ["kotlin"] = default,
-    ["lua"] = {"-- ", {"--[[ ", " ]]"}},
-    ["markdown"] = {false, {"<!--- ", " -->"}},
-    ["python"] = {"# ", false},
-    ["r"] = {"# ", false},
-    ["ruby"] = {"# ", false},
+    ["lua"] = {"--", {"--[[", "]]"}},
+    ["markdown"] = {false, {"<!---", "-->"}},
+    ["python"] = {"#", false},
+    ["r"] = {"#", false},
+    ["ruby"] = {"#", false},
     ["rust"] = default,
     ["swift"] = default,
-    ["vim"] = {"\" ", false},
+    ["vim"] = {"\"", false},
 }
 
 local function has_filetype(filetype)
