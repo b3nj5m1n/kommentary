@@ -8,5 +8,4 @@ end
 
 return {
     toggle_comment = toggle_comment,
-    test = test,
 }

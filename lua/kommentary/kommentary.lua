@@ -1,37 +1,9 @@
 local config = require("kommentary.config")
-
-local function trim(s)
-  return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
-local function insert_at_beginning(line, prefix)
-    return line:sub(0,0)..prefix..line:sub(1)
-end
-
-local function index_last_occurence(str, pattern)
-    local result = 0
-    local i = 0
-    while true do
-        i = str.find(pattern, i+1)
-        if i == nil then break end
-        result = i
-    end
-    return result
-end
-
-local function gsub_from_index(str, pattern, replacement, count, start_index)
-    -- Start index is exlusive
-    local result = string.sub(str, 1, start_index) .. string.gsub(string.sub(str, start_index+1, #str), pattern, replacement, count)
-    return result
-end
-
-local function escape_pattern(text)
-    return text:gsub("([^%w])", "%%%1")
-end
+local util = require("kommentary.util")
 
 local function is_comment_single(line, comment_string)
     -- Since the line might be indented, trim all whitespace
-    line = trim(line)
+    line = util.trim(line)
     return line:sub(1, #comment_string) == comment_string
 end
 
@@ -41,8 +13,8 @@ local function is_comment_multi(lines, comment_strings)
         return false
     end
     -- Only the first and last lines are relevant, these may be the same
-    local first_line = trim(lines[1])
-    local last_line = trim(lines[#lines])
+    local first_line = util.trim(lines[1])
+    local last_line = util.trim(lines[#lines])
     local begins = first_line:sub(1, #comment_strings[1]) == comment_strings[1]
     local ends = last_line:sub(-#comment_strings[2]) == comment_strings[2]
     return begins and ends
@@ -86,7 +58,7 @@ end
 
 local function comment_in_line(line_number, comment_string)
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
-    vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {insert_at_beginning(content, comment_string)})
+    vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {util.insert_at_beginning(content, comment_string)})
 end
 
 local function comment_out_line(line_number, comment_string)
@@ -110,12 +82,12 @@ local function comment_in_range(line_number_start, line_number_end, comment_stri
     else
         local result = {}
         if line_number_start == line_number_end then
-            result = {insert_at_beginning(content, comment_string[1]) .. comment_string[2]}
+            result = {util.insert_at_beginning(content, comment_string[1]) .. comment_string[2]}
         else
             result = {}
             for i, line in ipairs(content) do
                 if i == 1 then
-                    result[i] = insert_at_beginning(line, comment_string[1])
+                    result[i] = util.insert_at_beginning(line, comment_string[1])
                 else
                     result[i] = line
                 end
@@ -141,12 +113,12 @@ local function comment_out_range(line_number_start, line_number_end, comment_str
             for i, line in ipairs(content) do
                 local new_line = line
                 if i == 1 then
-                    new_line, _ = string.gsub(line, escape_pattern(comment_string[1]), "", 1)
+                    new_line, _ = string.gsub(line, util.escape_pattern(comment_string[1]), "", 1)
                 end
                 if i == #content then
                     -- This will make sure that only the last occurence of the suffix is replaced
-                    local start_index = index_last_occurence(line, comment_string[2])
-                    new_line, _ = gsub_from_index(line, escape_pattern(comment_string[2]), "", 1, start_index)
+                    local start_index = util.index_last_occurence(line, comment_string[2])
+                    new_line, _ = util.gsub_from_index(line, util.escape_pattern(comment_string[2]), "", 1, start_index)
                 end
                 result[i] = new_line
             end
