@@ -9,7 +9,7 @@ Plugin to comment text in and out, written in lua.
   - [x] Implement functions
   - [ ] Test
   - [ ] Work on selection
-  - [ ] Work on motion/textobject
+  - [x] Work on motion/textobject
 - [ ] Docstrings
 
 ## Install

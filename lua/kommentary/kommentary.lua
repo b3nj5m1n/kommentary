@@ -62,7 +62,7 @@ local function comment_in_line(line_number, comment_string)
 end
 
 local function comment_out_line(line_number, comment_string)
-    -- Todo: indentation
+    -- TODO: indentation
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
     if is_comment_single(content, comment_string) then
         local result, _ = string.gsub(content, comment_string, "", 1)
@@ -99,6 +99,8 @@ local function comment_in_range(line_number_start, line_number_end, comment_stri
 end
 
 local function comment_out_range(line_number_start, line_number_end, comment_string)
+    -- TODO: Will fail when trying to outcomment multiple single-line comments 
+    -- in a language that actually supports multi-line comments
     line_number_start = line_number_start-1
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     if comment_string == false then
