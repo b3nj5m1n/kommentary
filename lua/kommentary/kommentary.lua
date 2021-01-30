@@ -37,6 +37,9 @@ end
 
 -- Not properly tested yet, breaks when there is nothing on a beginning/end line
 local function is_comment_multi(lines, comment_strings)
+    if comment_strings == false then
+        return false
+    end
     -- Only the first and last lines are relevant, these may be the same
     local first_line = trim(lines[1])
     local last_line = trim(lines[#lines])
@@ -101,7 +104,7 @@ local function comment_in_range(line_number_start, line_number_end, comment_stri
     if comment_string == false then
         -- The language doesn't support multi-line comments, just loop over
         -- each line and comment it in with a single-line comment
-        for line_number = line_number_start, line_number_end, 1 do
+        for line_number = line_number_start+1, line_number_end, 1 do
             comment_in_line(line_number, config.get_single(0))
         end
     else
@@ -126,21 +129,29 @@ end
 local function comment_out_range(line_number_start, line_number_end, comment_string)
     line_number_start = line_number_start-1
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
-    if is_comment_multi(content, comment_string) then
-        local result = {}
-        for i, line in ipairs(content) do
-            local new_line = line
-            if i == 1 then
-                new_line, _ = string.gsub(line, escape_pattern(comment_string[1]), "", 1)
-            end
-            if i == #content then
-                -- This will make sure that only the last occurence of the suffix is replaced
-                local start_index = index_last_occurence(line, comment_string[2])
-                new_line, _ = gsub_from_index(line, escape_pattern(comment_string[2]), "", 1, start_index)
-            end
-            result[i] = new_line
+    if comment_string == false then
+        -- The language doesn't support multi-line comments, just loop over
+        -- each line and comment it in with a single-line comment
+        for line_number = line_number_start+1, line_number_end, 1 do
+            comment_out_line(line_number, config.get_single(0))
         end
-        vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
+    else
+        if is_comment_multi(content, comment_string) then
+            local result = {}
+            for i, line in ipairs(content) do
+                local new_line = line
+                if i == 1 then
+                    new_line, _ = string.gsub(line, escape_pattern(comment_string[1]), "", 1)
+                end
+                if i == #content then
+                    -- This will make sure that only the last occurence of the suffix is replaced
+                    local start_index = index_last_occurence(line, comment_string[2])
+                    new_line, _ = gsub_from_index(line, escape_pattern(comment_string[2]), "", 1, start_index)
+                end
+                result[i] = new_line
+            end
+            vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
+        end
     end
 end
 
