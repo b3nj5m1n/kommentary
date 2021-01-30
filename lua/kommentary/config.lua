@@ -7,6 +7,27 @@ convenience functions for retrieving configuration parameters.
 local default = {"//", {"/*", "*/"}}
 
 --[[--
+Set up keymappings.
+Sets up <Plug>Kommentary, to this you should map the prefix you want to use for
+	motions, so for example if you want to be able to to gc5j to toggle comments
+	for the next 5 lines, do this: `nmap gc <Plug>Kommentary`.
+Sets up <Plug>KommentaryVisual, which is obviously for the visual mode mapping,
+	for example to be able to do gc in visual mode, do this mapping:
+	`vmap gc <Plug>KommentaryVisual`, this will leave you in visual mode after
+	toggeling comments, if you always want to go back to normal mode afterwards:
+	`vmap gc <Plug>KommentaryVisual<C-c>`
+Sets up <Plug>KommentaryLine, which is what you should use for commenting out single
+	lines, so if you want to be able to do gcc in normal mode to comment out the
+	line you're currently on, do this: `nmap gcc <Plug>KommentaryLine`
+@treturn nil
+]]
+local function setup()
+    vim.api.nvim_set_keymap('n', '<Plug>Kommentary', 'v:lua.kommentary.toggle_comment()', { noremap = true, expr = true })
+    vim.api.nvim_set_keymap('n', '<Plug>KommentaryLine', '<cmd>call v:lua.kommentary.toggle_comment("single_line")<cr>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('v', '<Plug>KommentaryVisual', '<cmd>call v:lua.kommentary.toggle_comment("visual")<cr>', { noremap = true, silent = true })
+end
+
+--[[--
 Table mapping filetypes to comment strings.
 Configuration for each filetype, the first field is the prefix for a single
 line comment, the second field is either false, if multi-line comments aren't
@@ -86,6 +107,7 @@ local function get_multi(filetype)
 end
 
 return {
+    setup = setup,
     config = config_table,
     get_single = get_single,
     get_multi = get_multi,
