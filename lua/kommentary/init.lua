@@ -6,10 +6,6 @@ local function toggle_comment()
     kommentary.toggle_comment_line(row)
 end
 
-local function test()
-    print(config.get_single(0))
-end
-
 return {
     toggle_comment = toggle_comment,
     test = test,

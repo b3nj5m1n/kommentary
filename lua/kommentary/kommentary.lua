@@ -8,12 +8,6 @@ local function insert_at_beginning(line, prefix)
     return line:sub(0,0)..prefix..line:sub(1)
 end
 
-local function is_comment_single(line, comment_string)
-    -- Since the line might be indented, trim all whitespace
-    line = trim(line)
-    return line:sub(1, #comment_string) == comment_string
-end
-
 local function index_last_occurence(str, pattern)
     local result = 0
     local i = 0
@@ -35,7 +29,13 @@ local function escape_pattern(text)
     return text:gsub("([^%w])", "%%%1")
 end
 
--- Not properly tested yet
+local function is_comment_single(line, comment_string)
+    -- Since the line might be indented, trim all whitespace
+    line = trim(line)
+    return line:sub(1, #comment_string) == comment_string
+end
+
+-- Not properly tested yet, breaks when there is nothing on a beginning/end line
 local function is_comment_multi(lines, comment_strings)
     -- Only the first and last lines are relevant, these may be the same
     local first_line = trim(lines[1])
