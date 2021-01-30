@@ -1,4 +1,4 @@
-local config = require("config")
+local config = require("kommentary.config")
 
 local function trim(s)
   return (s:gsub("^%s*(.-)%s*$", "%1"))
