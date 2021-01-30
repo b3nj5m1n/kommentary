@@ -1,14 +1,8 @@
 # kommentary
 
-Plugin to comment text in and out, written in lua.
+Neovim plugin to comment text in and out, written in lua. Supports commenting out the current line, a visual selection and a motion/textobject.
 
-## To-do
-
-- [x] Single-line comments
-- [x] Multi-line comments
-  - [x] Implement functions
-  - [x] Work on visual/selection
-  - [x] Work on motion/textobject
+![](https://s2.gifyu.com/images/Peek-2021-01-30-23-12.gif)
 
 ## Install
 
