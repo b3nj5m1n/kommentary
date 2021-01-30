@@ -19,6 +19,10 @@ local function toggle_comment(...)
     if args[1] == "single_line" then
         local row = vim.api.nvim_win_get_cursor(0)[1]
         kommentary.toggle_comment_line(row)
+    elseif args[1] == "visual" then
+        local line_number_start = vim.fn.getpos('v')[2]
+        local line_number_end = vim.fn.getcurpos()[2]
+        kommentary.toggle_comment_range(line_number_start, line_number_end)
     else
         -- When using g@, the marks [ and ] will contain the position of the
         -- start and the end of the motion, respectively. vim.fn.getpos() returns

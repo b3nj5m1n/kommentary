@@ -8,7 +8,7 @@ Plugin to comment text in and out, written in lua.
 - [ ] Multi-line comments
   - [x] Implement functions
   - [ ] Test
-  - [ ] Work on selection
+  - [x] Work on visual/selection
   - [x] Work on motion/textobject
 - [ ] Docstrings
 

@@ -22,6 +22,7 @@ local config_table = {
     ["ruby"] = {"# ", false},
     ["rust"] = default,
     ["swift"] = default,
+    ["vim"] = {"\" ", false},
 }
 
 local function has_filetype(filetype)
