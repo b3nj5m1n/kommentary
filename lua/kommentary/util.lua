@@ -1,10 +1,11 @@
 
 local function trim(s)
-  return (s:gsub("^%s*(.-)%s*$", "%1"))
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
 local function insert_at_beginning(line, prefix)
-    return line:sub(0,0)..prefix..line:sub(1)
+    local start_index = string.find(line, "%S")
+    return string.sub(line, 0, start_index-1) .. prefix .. string.sub(line, start_index, #line)
 end
 
 local function index_last_occurence(str, pattern)

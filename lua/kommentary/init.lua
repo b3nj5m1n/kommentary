@@ -10,10 +10,10 @@ local function toggle_comment(...)
     -- typing gc will be as if you typed g@, then you can do a motion like 5j,
     -- now the operatorfunc gets called and has information about the motion,
     -- such as the range on which the motion operated. See :h operatorfunc.
-	if #args <= 0 then
+    if #args <= 0 then
         vim.api.nvim_set_option('operatorfunc', 'v:lua.kommentary.toggle_comment')
         return "g@"
-	end
+    end
     -- Special argument passed by <Plug>KommentaryLine (gcc) to operate
     -- on just the current line
     if args[1] == "single_line" then
