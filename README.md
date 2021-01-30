@@ -5,12 +5,10 @@ Plugin to comment text in and out, written in lua.
 ## To-do
 
 - [x] Single-line comments
-- [ ] Multi-line comments
+- [x] Multi-line comments
   - [x] Implement functions
-  - [ ] Test
   - [x] Work on visual/selection
   - [x] Work on motion/textobject
-- [ ] Docstrings
 
 ## Install
 
