@@ -1,6 +1,14 @@
+--[[--
+Configuration.
+
+This module contains the mappings of comment strings to filetypes, as well as
+convenience functions for retrieving configuration parameters.
+]]
 local default = {"//", {"/*", "*/"}}
 
---[[ Configuration for each filetype, the first field is the prefix for a single
+--[[--
+Table mapping filetypes to comment strings.
+Configuration for each filetype, the first field is the prefix for a single
 line comment, the second field is either false, if multi-line comments aren't
 supported by that filetype, or a table where the first field is the prefix
 for a multi-line comment and the second field is the suffix. Note that the very
@@ -25,10 +33,24 @@ local config_table = {
     ["vim"] = {"\"", false},
 }
 
+--[[--
+Check if configuration for filetype exists.
+@tparam string filetype Filetype to check
+@treturn bool true if a config is available, otherwise false
+]]
 local function has_filetype(filetype)
     return config_table[filetype] ~= nil
 end
 
+--[[--
+Get the full config for the given filetype.
+@tparam string filetype Filetype to retrieve configuration for,
+	0 means infere by current buffer.
+	If the filetype doesn't have a configuration available,
+	the default configuration will be returned.
+@treturn {[string]={?bool|string,?bool|{string,string}}}
+	Full configuration for filetype
+]]
 local function get_config(filetype)
     if filetype == 0 then
         filetype = vim.bo.filetype
@@ -39,10 +61,26 @@ local function get_config(filetype)
     return config_table[filetype]
 end
 
+--[[--
+Get the single-line comment string for the given filetype.
+@tparam string filetype Filetype to retrieve configuration for,
+	0 means infere by current buffer.
+	If the filetype doesn't have a configuration available,
+	the default configuration will be returned.
+@treturn ?bool|string Single-line comment string for filetype
+]]
 local function get_single(filetype)
     return get_config(filetype)[1]
 end
 
+--[[--
+Get the multi-line comment string for the given filetype.
+@tparam string filetype Filetype to retrieve configuration for,
+	0 means infere by current buffer.
+	If the filetype doesn't have a configuration available,
+	the default configuration will be returned.
+@treturn ?bool|{string,string} Multi-line comment strings for filetype
+]]
 local function get_multi(filetype)
     return get_config(filetype)[2]
 end
