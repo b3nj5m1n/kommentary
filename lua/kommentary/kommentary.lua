@@ -162,8 +162,6 @@ normal code, but remove one *level* of commenting instead.
 @see comment_out_line
 ]]
 local function comment_out_range(line_number_start, line_number_end, comment_string)
-    -- TODO: Will fail when trying to comment out a single line commented out
-    -- with multi-line pre- and suffix
     line_number_start = line_number_start-1
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     -- If the range consists of multiple single-line comments
@@ -174,12 +172,12 @@ local function comment_out_range(line_number_start, line_number_end, comment_str
             for i, line in ipairs(content) do
                 local new_line = line
                 if i == 1 then
-                    new_line, _ = string.gsub(line, util.escape_pattern(comment_string[1]) .. "%s*", "", 1)
+                    new_line, _ = string.gsub(new_line, util.escape_pattern(comment_string[1]) .. "%s*", "", 1)
                 end
                 if i == #content then
                     -- This will make sure that only the last occurence of the suffix is replaced
                     local start_index = util.index_last_occurence(line, comment_string[2])
-                    new_line, _ = util.gsub_from_index(line, "%s*" .. util.escape_pattern(comment_string[2]), "", 1, start_index)
+                    new_line, _ = util.gsub_from_index(new_line, "%s*" .. util.escape_pattern(comment_string[2]), "", 1, start_index)
                 end
                 result[i] = new_line
             end
@@ -227,10 +225,22 @@ Behaves the same way as toggeling a single line.
 @see toggle_comment_line
 ]]
 local function toggle_comment_range(line_number_start, line_number_end)
+    --[[ If you start a selection and then move up, it would be detected
+    as a negative range, so if that's the case swap the start and end. ]]
+    if line_number_end < line_number_start then
+        line_number_start, line_number_end = line_number_end, line_number_start
+    end
+    print(line_number_start, line_number_end)
     local comment_string = config.get_multi(0)
     if is_comment(line_number_start, line_number_end) then
         comment_out_range(line_number_start, line_number_end, comment_string)
     else
+        --[[ If the range is a single line, do a single-line comment toggle instead,
+        but only if trying to comment in since it could be annoying otherwise. ]]
+        if line_number_end == line_number_start then
+            toggle_comment_line(line_number_start)
+            return nil
+        end
         comment_in_range(line_number_start, line_number_end, comment_string)
     end
 end
