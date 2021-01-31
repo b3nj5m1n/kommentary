@@ -27,6 +27,9 @@ function M.insert_at_beginning(line, prefix)
         return M.trim(prefix)
     end
     local start_index = string.find(line, "%S")
+    --[[ If there are no non-whitespace characters on the line,
+    use 1 as a starting index ]]
+    start_index = start_index == nil and 1 or start_index
     return string.sub(line, 0, start_index-1) .. prefix .. string.sub(line, start_index, #line)
 end
 
@@ -40,7 +43,7 @@ function M.index_last_occurence(str, pattern)
     local result = 0
     local i = 0
     while true do
-        i = str.find(pattern, i+1)
+        i = string.find(str, pattern, i+1)
         if i == nil then break end
         result = i
     end
@@ -53,12 +56,13 @@ Perform a gsub, starting only from a specific index.
 @tparam string pattern Pattern to replace
 @tparam string replacement What to replace the pattern with to replace
 @tparam int count The maximum number of replacements to do
-@tparam int start_index Where to start the gsub
+@tparam int start_index Where to start the gsub, inclusive
 @treturn string Gsubbed string
 ]]
 function M.gsub_from_index(str, pattern, replacement, count, start_index)
-    -- Start index is exlusive
-    local result = string.sub(str, 1, start_index) .. string.gsub(string.sub(str, start_index+1, #str), pattern, replacement, count)
+    -- The test if start_index-1 prevents duplicating chars when calling with 0
+    local result = (start_index-1 > 0 and string.sub(str, 1, start_index-1) or '')
+        .. string.gsub(string.sub(str, start_index, #str), pattern, replacement, count)
     return result
 end
 
