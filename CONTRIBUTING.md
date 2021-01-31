@@ -7,7 +7,7 @@ Please do not create new any  new local variables, either set the full config im
 So not like this:
 ```lua
 local hashtag = {"#", false}
-local config_table = {
+local config = {
     ["c"] = default,
     ["cpp"] = default,
     ["cs"] = default,
@@ -28,7 +28,7 @@ local config_table = {
 
 But like this:
 ```lua
-local config_table = {
+local config = {
     ["c"] = default,
     ["cpp"] = default,
     ["cs"] = default,
@@ -49,7 +49,7 @@ local config_table = {
 
 Also, please sort the table after making your changes, so instead of the above, please submit this:
 ```lua
-local config_table = {
+local config = {
     ["c"] = default,
     ["cpp"] = default,
     ["cs"] = default,

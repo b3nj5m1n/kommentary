@@ -4,6 +4,7 @@ Initialization.
 This module handles the initialization of the plugin.
 ]]
 local kommentary = require("kommentary.kommentary")
+local M = {}
 
 --[[--
 Toggle comment on current line, selection or motion.
@@ -15,7 +16,7 @@ Toggle comment on current line, selection or motion.
 	and returns 'g@' to be used in an expression mapping, otherwise it will
 	comment out and not return anything.
 ]]
-local function toggle_comment(...)
+function M.toggle_comment(...)
     local args = {...}
     --[[ When called without any arguments (gc), return g@ (Which will be inserted
     into the mapping literaly, since the mapping is an <expr>, so you have gc
@@ -47,6 +48,4 @@ local function toggle_comment(...)
     end
 end
 
-return {
-    toggle_comment = toggle_comment,
-}
+return M

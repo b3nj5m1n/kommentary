@@ -5,6 +5,7 @@ This module contains the mappings of comment strings to filetypes, as well as
 convenience functions for retrieving configuration parameters.
 ]]
 local default = {"//", {"/*", "*/"}}
+local M = {}
 
 --[[--
 Set up keymappings.
@@ -21,7 +22,7 @@ Sets up <Plug>KommentaryLine, which is what you should use for commenting out si
 	line you're currently on, do this: `nmap gcc <Plug>KommentaryLine`
 @treturn nil
 ]]
-local function setup()
+function M.setup()
     vim.api.nvim_set_keymap('n', '<Plug>Kommentary', 'v:lua.kommentary.toggle_comment()', { noremap = true, expr = true })
     vim.api.nvim_set_keymap('n', '<Plug>KommentaryLine', '<cmd>call v:lua.kommentary.toggle_comment("single_line")<cr>', { noremap = true, silent = true })
     vim.api.nvim_set_keymap('v', '<Plug>KommentaryVisual', '<cmd>call v:lua.kommentary.toggle_comment("visual")<cr>', { noremap = true, silent = true })
@@ -36,7 +37,7 @@ for a multi-line comment and the second field is the suffix. Note that the very
 first field can also be false, if a language always requires a pre- and suffix.
 Newlines are not allowed, since they can't be matched when commenting out.
 ]]
-local config_table = {
+M.config = {
     ["bash"] = {"#", false},
     ["c"] = default,
     ["clojure"] = {";", {"(comment ", " )"}},
@@ -64,8 +65,8 @@ Check if configuration for filetype exists.
 @tparam string filetype Filetype to check
 @treturn bool true if a config is available, otherwise false
 ]]
-local function has_filetype(filetype)
-    return config_table[filetype] ~= nil
+function M.has_filetype(filetype)
+    return M.config[filetype] ~= nil
 end
 
 --[[--
@@ -77,14 +78,14 @@ Get the full config for the given filetype.
 @treturn {[string]={?bool|string,?bool|{string,string}}}
 	Full configuration for filetype
 ]]
-local function get_config(filetype)
+function M.get_config(filetype)
     if filetype == 0 then
         filetype = vim.bo.filetype
     end
-    if not has_filetype(filetype) then
+    if not M.has_filetype(filetype) then
         return default
     end
-    return config_table[filetype]
+    return M.config[filetype]
 end
 
 --[[--
@@ -95,8 +96,8 @@ Get the single-line comment string for the given filetype.
 	the default configuration will be returned.
 @treturn ?bool|string Single-line comment string for filetype
 ]]
-local function get_single(filetype)
-    return get_config(filetype)[1]
+function M.get_single(filetype)
+    return M.get_config(filetype)[1]
 end
 
 --[[--
@@ -107,13 +108,8 @@ Get the multi-line comment string for the given filetype.
 	the default configuration will be returned.
 @treturn ?bool|{string,string} Multi-line comment strings for filetype
 ]]
-local function get_multi(filetype)
-    return get_config(filetype)[2]
+function M.get_multi(filetype)
+    return M.get_config(filetype)[2]
 end
 
-return {
-    setup = setup,
-    config = config_table,
-    get_single = get_single,
-    get_multi = get_multi,
-}
+return M
