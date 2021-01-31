@@ -52,6 +52,8 @@ local config_table = {
     ["rust"] = default,
     ["swift"] = default,
     ["vim"] = {"\"", false},
+    ["clojure"] = {";", {"(comment ", " )"}},
+    ["fennnel"] = {";"}
 }
 
 --[[--
