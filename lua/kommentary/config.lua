@@ -71,6 +71,25 @@ function M.has_filetype(filetype)
     return M.config[filetype] ~= nil
 end
 
+function M.config_from_commentstring(commentstring)
+    if commenstring == "/*%s*/" then return default end
+
+    local placeholder = '%s'
+    local where = commentstring:find(util.escape_pattern(placeholder))
+
+    if not where then
+        return default
+    else
+        where = where - 1
+    end
+    if where + #placeholder  == #commentstring then
+        return { commentstring:sub(1, -#placeholder-1), false }
+    end
+
+    return { false, { commentstring:sub(1, where),  commentstring:sub(where + #placeholder + 1, -1) } }
+end
+
+
 --[[--
 Get the full config for the given filetype.
 @tparam string filetype Filetype to retrieve configuration for,
@@ -81,11 +100,13 @@ Get the full config for the given filetype.
 	Full configuration for filetype
 ]]
 function M.get_config(filetype)
+    local use_fallback = false
     if filetype == 0 then
         filetype = vim.bo.filetype
+        use_fallback = true
     end
     if not M.has_filetype(filetype) then
-        return default
+        return use_fallback and M.config_from_commentstring(vim.bo.commentstring) or default
     end
     return M.config[filetype]
 end
