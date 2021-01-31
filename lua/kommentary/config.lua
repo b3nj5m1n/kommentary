@@ -5,7 +5,6 @@ This module contains the mappings of comment strings to filetypes, as well as
 convenience functions for retrieving configuration parameters.
 ]]
 local default = {"//", {"/*", "*/"}}
-local shell = {"#", false}
 
 --[[--
 Set up keymappings.
@@ -38,13 +37,13 @@ first field can also be false, if a language always requires a pre- and suffix.
 Newlines are not allowed, since they can't be matched when commenting out.
 ]]
 local config_table = {
-    ["bash"] = shell,
+    ["bash"] = {"#", false},
     ["c"] = default,
     ["clojure"] = {";", {"(comment ", " )"}},
     ["cpp"] = default,
     ["cs"] = default,
     ["fennnel"] = {";", false},
-    ["fish"] = shell,
+    ["fish"] = {"#", false},
     ["go"] = default,
     ["java"] = default,
     ["javascript"] = default,
@@ -57,7 +56,7 @@ local config_table = {
     ["rust"] = default,
     ["swift"] = default,
     ["vim"] = {"\"", false},
-    ["zsh"] = shell
+    ["zsh"] = {"#", false}
 }
 
 --[[--
