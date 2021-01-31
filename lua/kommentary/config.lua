@@ -73,10 +73,8 @@ end
 
 function M.config_from_commentstring(commentstring)
     if commenstring == "/*%s*/" then return default end
-
     local placeholder = '%s'
     local where = commentstring:find(util.escape_pattern(placeholder))
-
     if not where then
         return default
     end
