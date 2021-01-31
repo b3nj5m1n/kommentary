@@ -5,6 +5,7 @@ This module contains the mappings of comment strings to filetypes, as well as
 convenience functions for retrieving configuration parameters.
 ]]
 local default = {"//", {"/*", "*/"}}
+local shell = {"#", false}
 
 --[[--
 Set up keymappings.
@@ -53,7 +54,10 @@ local config_table = {
     ["swift"] = default,
     ["vim"] = {"\"", false},
     ["clojure"] = {";", {"(comment ", " )"}},
-    ["fennnel"] = {";", false}
+    ["fennnel"] = {";", false},
+    ["bash"] = shell,
+    ["fish"] = shell,
+    ["zsh"] = shell
 }
 
 --[[--
