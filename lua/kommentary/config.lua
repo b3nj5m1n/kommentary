@@ -82,7 +82,7 @@ function M.config_from_commentstring(commentstring)
     else
         where = where - 1
     end
-    if where + #placeholder  == #commentstring then
+    if where + #placeholder == #commentstring then
         return { commentstring:sub(1, -#placeholder-1), false }
     end
 
