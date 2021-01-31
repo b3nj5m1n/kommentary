@@ -1,5 +1,5 @@
 local lu = require('luaunit')
-local util = require('lua.kommentary.util')
+local util = require('kommentary.util')
 
 Test_Util = {}
 

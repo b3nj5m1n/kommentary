@@ -29,7 +29,7 @@ Check if a string is a multi-line comment.
 @treturn bool true if it is a multi-line comment, otherwise false
 ]]
 function M.is_comment_multi(lines, comment_strings)
-    if comment_strings == false then
+    if comment_strings == false or #lines < 1 then
         return false
     end
     -- Only the first and last lines are relevant, these may be the same
@@ -47,6 +47,9 @@ Check if a string is a range of single-line comments.
 @treturn bool true if it is a range of single-line comments
 ]]
 function M.is_comment_multi_single(lines, comment_string)
+    if comment_string == false or #lines < 1 then
+        return false
+    end
     for _, line in ipairs(lines) do
         if not M.is_comment_single(line, comment_string) then
             return false

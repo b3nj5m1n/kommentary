@@ -41,11 +41,18 @@ Then you can access it from doc/index.html
 
 There are unit tests available in the directory `lua/test`, you'll need to have [luaunit](https://github.com/bluebird75/luaunit) installed, then run:
 ```sh
-lua lua/test/test_util.lua
+cd ./lua/
+lua test/test_util.lua
 
 # You might need to specify the lua version because luaunit doesn't support the latest ones
-# lua5.3 lua/test/test_util.lua
+# lua5.3 test/test_util.lua
 
 # For verbose output (Which tests are being run)
-# lua lua/test/test_util.lua -v
+# lua test/test_util.lua -v
+```
+
+Or to run all tests:
+```sh
+cd ./lua/
+./run_tests.sh
 ```
