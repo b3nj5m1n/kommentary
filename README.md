@@ -26,3 +26,13 @@ Replace rust with the filetype you want to configure, the first field in the tab
 ```lua
 require('kommentary.config').config["rust"] = {"// ", {"/* ", " */"}}
 ```
+
+## Documentation
+
+The code is heavily commented, functions are documented with using [LDoc](https://github.com/lunarmodules/LDoc).
+
+You can build the documentation with this command:
+```
+ldoc .
+```
+Then you can access it from doc/index.html
