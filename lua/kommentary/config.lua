@@ -101,7 +101,7 @@ function M.get_config(filetype)
         filetype = vim.bo.filetype
     end
     if not M.has_filetype(filetype) then
-        return use_fallback and M.config_from_commentstring(vim.bo.commentstring) or default
+        return M.config_from_commentstring(vim.bo.commentstring)
     end
     return M.config[filetype]
 end
