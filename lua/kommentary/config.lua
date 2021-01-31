@@ -71,18 +71,25 @@ function M.has_filetype(filetype)
     return M.config[filetype] ~= nil
 end
 
+--[[--
+Generate a config table from a commentstring.
+@tparam string commenting The commentstring to convert, see :h commentstring
+@treturn {?bool|string,?bool{string,string}} Config table for commentstring
+]]
 function M.config_from_commentstring(commentstring)
-    if commenstring == "/*%s*/" then return default end
     local placeholder = '%s'
-    local where = commentstring:find(util.escape_pattern(placeholder))
-    if not where then
+    local index_placeholder = commentstring:find(util.escape_pattern(placeholder))
+    if not index_placeholder then
         return default
     end
-    where = where - 1
-    if where + #placeholder == #commentstring then
+    index_placeholder = index_placeholder - 1
+    --[[ Test if the commentstring is a single-line or multi-line comment,
+    extract the appropriate fields into a table ]]
+    if index_placeholder + #placeholder == #commentstring then
         return {commentstring:sub(1, -#placeholder-1), false}
     end
-    return {false, {commentstring:sub(1, where),  commentstring:sub(where + #placeholder + 1, -1)}}
+    return {false, {commentstring:sub(1, index_placeholder),
+        commentstring:sub(index_placeholder + #placeholder + 1, -1)}}
 end
 
 --[[--
@@ -99,7 +106,10 @@ function M.get_config(filetype)
         filetype = vim.bo.filetype
     end
     if not M.has_filetype(filetype) then
-        return M.config_from_commentstring(vim.bo.commentstring)
+        --[[ We can't get the commentstring for a filetype different from the
+        current buffer, so in that case always return the default ]]
+        return filetype == vim.bo.filetype
+            and M.config_from_commentstring(vim.bo.commentstring) or default
     end
     return M.config[filetype]
 end
