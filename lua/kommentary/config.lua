@@ -99,10 +99,8 @@ Get the full config for the given filetype.
 	Full configuration for filetype
 ]]
 function M.get_config(filetype)
-    local use_fallback = false
     if filetype == 0 then
         filetype = vim.bo.filetype
-        use_fallback = true
     end
     if not M.has_filetype(filetype) then
         return use_fallback and M.config_from_commentstring(vim.bo.commentstring) or default
