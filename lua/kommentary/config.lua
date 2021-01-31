@@ -43,7 +43,7 @@ M.config = {
     ["clojure"] = {";", {"(comment ", " )"}},
     ["cpp"] = default,
     ["cs"] = default,
-    ["fennnel"] = {";", false},
+    ["fennel"] = {";", false},
     ["fish"] = {"#", false},
     ["go"] = default,
     ["java"] = default,
@@ -55,9 +55,10 @@ M.config = {
     ["r"] = {"#", false},
     ["ruby"] = {"#", false},
     ["rust"] = default,
+    ["sh"] = {"#", false},
     ["swift"] = default,
     ["vim"] = {"\"", false},
-    ["zsh"] = {"#", false}
+    ["zsh"] = {"#", false},
 }
 
 --[[--
