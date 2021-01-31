@@ -37,9 +37,13 @@ first field can also be false, if a language always requires a pre- and suffix.
 Newlines are not allowed, since they can't be matched when commenting out.
 ]]
 local config_table = {
+    ["bash"] = {"#", false},
     ["c"] = default,
+    ["clojure"] = {";", {"(comment ", " )"}},
     ["cpp"] = default,
     ["cs"] = default,
+    ["fennnel"] = {";", false},
+    ["fish"] = {"#", false},
     ["go"] = default,
     ["java"] = default,
     ["javascript"] = default,
@@ -52,6 +56,7 @@ local config_table = {
     ["rust"] = default,
     ["swift"] = default,
     ["vim"] = {"\"", false},
+    ["zsh"] = {"#", false}
 }
 
 --[[--
