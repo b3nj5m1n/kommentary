@@ -24,9 +24,11 @@ Sets up <Plug>KommentaryLine, which is what you should use for commenting out si
 @treturn nil
 ]]
 function M.setup()
-    vim.api.nvim_set_keymap('n', '<Plug>Kommentary', 'v:lua.kommentary.toggle_comment()', { noremap = true, expr = true })
-    vim.api.nvim_set_keymap('n', '<Plug>KommentaryLine', '<cmd>call v:lua.kommentary.toggle_comment("single_line")<cr>', { noremap = true, silent = true })
-    vim.api.nvim_set_keymap('v', '<Plug>KommentaryVisual', '<cmd>call v:lua.kommentary.toggle_comment("visual")<cr>', { noremap = true, silent = true })
+    local modes = util.enum({"line", "visual", "motion", "init"})
+    vim.api.nvim_set_keymap('n', '<Plug>Kommentary', 'v:lua.kommentary.go(' .. modes.init .. ')', { noremap = true, expr = true })
+    vim.api.nvim_set_keymap('n', '<Plug>KommentaryLine', '<cmd>call v:lua.kommentary.go(' .. modes.line .. ')<cr>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('v', '<Plug>KommentaryVisual', '<cmd>call v:lua.kommentary.go(' .. modes.visual .. ')<cr>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('v', '<Plug>KommentaryVisualSingles', '<cmd>lua require("kommentary");kommentary.go(' .. modes.visual .. ', ' .. "{kommentary.toggle_comment_singles}" .. ')<cr>', { noremap = true, silent = false })
 end
 
 --[[--
