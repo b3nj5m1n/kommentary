@@ -295,6 +295,15 @@ function M.toggle_comment_range(line_number_start, line_number_end, mode)
         if line_number_start == line_number_end then
             mode = modes.force_single
         end
+        -- If the language doesn't support multi-line comments
+        if comment_strings == false then
+            mode = modes.force_single
+        end
+        -- If the language doesn't support single-line comments
+        if config.get_single(0) == false then
+            mode = modes.force_multi
+        end
+        -- The order of these checks should gurantee the correct mode is picked
     end
     if M.is_comment(line_number_start, line_number_end) then
         M.comment_out_range(line_number_start, line_number_end, comment_strings)
