@@ -7,6 +7,7 @@ in/out/toggeling and detecting comments.
 ]]
 local config = require("kommentary.config")
 local util = require("kommentary.util")
+local M = {}
 
 --[[--
 Check if a string is a single-line comment.
@@ -14,7 +15,7 @@ Check if a string is a single-line comment.
 @tparam string comment_string The prefix of a single-line comment
 @treturn bool true if it is a single-line comment, otherwise false
 ]]
-local function is_comment_single(line, comment_string)
+function M.is_comment_single(line, comment_string)
     -- Since the line might be indented, trim all whitespace
     line = util.trim(line)
     return line:sub(1, #comment_string) == comment_string
@@ -27,7 +28,7 @@ Check if a string is a multi-line comment.
         suffix of a multi-line comment
 @treturn bool true if it is a multi-line comment, otherwise false
 ]]
-local function is_comment_multi(lines, comment_strings)
+function M.is_comment_multi(lines, comment_strings)
     if comment_strings == false then
         return false
     end
@@ -40,12 +41,28 @@ local function is_comment_multi(lines, comment_strings)
 end
 
 --[[--
+Check if a string is a range of single-line comments.
+@tparam {string,...} lines A table of lines
+@tparam string comment_string The prefix of a single-line comment
+@treturn bool true if it is a range of single-line comments
+]]
+function M.is_comment_multi_single(lines, comment_string)
+    for _, line in ipairs(lines) do
+        if not M.is_comment_single(line, comment_string) then
+            return false
+        end
+    end
+    -- All of the lines are single-line comments
+    return true
+end
+
+--[[--
 Checks if the specified range in the buffer is a comment.
 @tparam int line_number_start Start of the range, inclusive
 @tparam int line_number_end End of the range, inclusive
 @treturn bool true if it is a multi-line comment, otherwise false
 ]]
-local function is_comment(line_number_start, line_number_end)
+function M.is_comment(line_number_start, line_number_end)
     line_number_start = line_number_start-1
     -- Get the content of the range specififed, this will return a table of lines
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
@@ -53,28 +70,27 @@ local function is_comment(line_number_start, line_number_end)
     if #content == 1 then
         local comment_string = config.get_single(0)
         if not comment_string == false then
-            return is_comment_single(content[1], comment_string)
+            return M.is_comment_single(content[1], comment_string)
         else
             -- In case the language doesn't support single-line comments
-            return is_comment_multi(content, comment_string)
+            comment_string = config.get_multi(0)
+            return M.is_comment_multi(content, comment_string)
         end
     elseif #content > 1 then
         local comment_string = config.get_multi(0)
-        local result = is_comment_multi(content, comment_string)
+        local result = M.is_comment_multi(content, comment_string)
         -- If the language doesn't support multiline comments, or
         -- if the lines are not a multiline comment,
         -- they might still be multiple single-line comments
-        if not result then
-            comment_string = config.get_single(0)
-            for _, line in ipairs(content) do
-                if not is_comment_single(line, comment_string) then
-                    return false
-                end
-            end
-            -- All of the lines are single-line comments
-            return true
-        else
+        if result then
             return result
+        else
+            comment_string = config.get_single(0)
+            if comment_string == false then
+                return result
+            else
+                return M.is_comment_multi_single(content, comment_string)
+            end
         end
     else
         error("Empty range.")
@@ -87,7 +103,7 @@ Turns the line into a single-line comment.
 @tparam string comment_string The prefix of a single-line comment
 @treturn nil
 ]]
-local function comment_in_line(line_number, comment_string)
+function M.comment_in_line(line_number, comment_string)
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
     vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {util.insert_at_beginning(content, comment_string .. " ")})
 end
@@ -102,11 +118,24 @@ turn into:  `-- This has been commented out 2 times`.
 @tparam string comment_string The prefix of a single-line comment
 @treturn nil
 ]]
-local function comment_out_line(line_number, comment_string)
+function M.comment_out_line(line_number, comment_string)
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
-    if is_comment_single(content, comment_string) then
+    if M.is_comment_single(content, comment_string) then
         local result, _ = string.gsub(content, util.escape_pattern(comment_string) .. "%s*", "", 1)
         vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {result})
+    end
+end
+
+--[[--
+Turns the range into multiple single-line comments.
+@tparam int line_number_start Start of the range, inclusive
+@tparam int line_number_end End of the range, inclusive
+@treturn nil
+]]
+function M.comment_in_range_single(line_number_start, line_number_end)
+    line_number_start = line_number_start-1
+    for line_number = line_number_start+1, line_number_end, 1 do
+        M.comment_in_line(line_number, config.get_single(0))
     end
 end
 
@@ -120,15 +149,13 @@ into multiple single-line comments instead.
         suffix of a multi-line comment
 @treturn nil
 ]]
-local function comment_in_range(line_number_start, line_number_end, comment_string)
+function M.comment_in_range(line_number_start, line_number_end, comment_string)
     line_number_start = line_number_start-1
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     if comment_string == false then
         -- The language doesn't support multi-line comments, just loop over
         -- each line and comment it in with a single-line comment
-        for line_number = line_number_start+1, line_number_end, 1 do
-            comment_in_line(line_number, config.get_single(0))
-        end
+        M.comment_in_range_single(line_number_start, line_number_end)
     else
         local result = {}
         if line_number_start == line_number_end then
@@ -161,13 +188,13 @@ normal code, but remove one *level* of commenting instead.
 @treturn nil
 @see comment_out_line
 ]]
-local function comment_out_range(line_number_start, line_number_end, comment_string)
+function M.comment_out_range(line_number_start, line_number_end, comment_string)
     line_number_start = line_number_start-1
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     -- If the range consists of multiple single-line comments
     local single_comments_array = comment_string == false
     if not comment_string == false then
-        if is_comment_multi(content, comment_string) then
+        if M.is_comment_multi(content, comment_string) then
             local result = {}
             for i, line in ipairs(content) do
                 local new_line = line
@@ -191,7 +218,7 @@ local function comment_out_range(line_number_start, line_number_end, comment_str
         -- range just doesn't use them, either way: loop over each
         -- line and comment it out with a single-line comment
         for line_number = line_number_start+1, line_number_end, 1 do
-            comment_out_line(line_number, config.get_single(0))
+            M.comment_out_line(line_number, config.get_single(0))
         end
     end
 end
@@ -207,12 +234,17 @@ comments before starting to toggle comments, so for example in lua:
 @tparam int line_number Line to operate on
 @treturn nil
 ]]
-local function toggle_comment_line(line_number)
+function M.toggle_comment_line(line_number)
     local comment_string = config.get_single(0)
-    if is_comment(line_number, line_number) then
-        comment_out_line(line_number, comment_string)
+    -- If the language doesn't support single-line comments
+    if comment_string == false then
+        M.toggle_comment_range(line_number, line_number, true)
+        return nil
+    end
+    if M.is_comment(line_number, line_number) then
+        M.comment_out_line(line_number, comment_string)
     else
-        comment_in_line(line_number, comment_string)
+        M.comment_in_line(line_number, comment_string)
     end
 end
 
@@ -221,38 +253,28 @@ Toggles commenting on the range.
 Behaves the same way as toggeling a single line.
 @tparam int line_number_start Start of the range, inclusive
 @tparam int line_number_end End of the range, inclusive
+@tparam bool force_multi Force the use of multi-line comment prefix and suffix
 @treturn nil
 @see toggle_comment_line
 ]]
-local function toggle_comment_range(line_number_start, line_number_end)
+function M.toggle_comment_range(line_number_start, line_number_end, force_multi)
     --[[ If you start a selection and then move up, it would be detected
     as a negative range, so if that's the case swap the start and end. ]]
     if line_number_end < line_number_start then
         line_number_start, line_number_end = line_number_end, line_number_start
     end
-    print(line_number_start, line_number_end)
-    local comment_string = config.get_multi(0)
-    if is_comment(line_number_start, line_number_end) then
-        comment_out_range(line_number_start, line_number_end, comment_string)
+    local comment_strings = config.get_multi(0)
+    if M.is_comment(line_number_start, line_number_end) then
+        M.comment_out_range(line_number_start, line_number_end, comment_strings)
     else
         --[[ If the range is a single line, do a single-line comment toggle instead,
         but only if trying to comment in since it could be annoying otherwise. ]]
-        if line_number_end == line_number_start then
-            toggle_comment_line(line_number_start)
+        if line_number_end == line_number_start and not force_multi then
+            M.toggle_comment_line(line_number_start)
             return nil
         end
-        comment_in_range(line_number_start, line_number_end, comment_string)
+        M.comment_in_range(line_number_start, line_number_end, comment_strings)
     end
 end
 
-return {
-    is_comment_single = is_comment_single,
-    is_comment_multi = is_comment_multi,
-    is_comment = is_comment,
-    comment_in_line = comment_in_line,
-    comment_out_line = comment_out_line,
-    comment_in_range = comment_in_range,
-    comment_out_range = comment_out_range,
-    toggle_comment_line = toggle_comment_line,
-    toggle_comment_range = toggle_comment_range,
-}
+return M
