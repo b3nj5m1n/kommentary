@@ -22,6 +22,10 @@ Insert prefix before the first non-whitespace character in string.
 @treturn string String with prefix before first non-whitespace character
 ]]
 function M.insert_at_beginning(line, prefix)
+    -- If the line is empty, just return the prefix with any whitespace stipped
+    if line == nil or line == '' then
+        return M.trim(prefix)
+    end
     local start_index = string.find(line, "%S")
     return string.sub(line, 0, start_index-1) .. prefix .. string.sub(line, start_index, #line)
 end
