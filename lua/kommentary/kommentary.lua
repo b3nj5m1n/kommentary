@@ -132,10 +132,10 @@ Turns the range into multiple single-line comments.
 @tparam int line_number_end End of the range, inclusive
 @treturn nil
 ]]
-function M.comment_in_range_single(line_number_start, line_number_end)
+function M.comment_in_range_single(line_number_start, line_number_end, comment_string)
     line_number_start = line_number_start-1
     for line_number = line_number_start+1, line_number_end, 1 do
-        M.comment_in_line(line_number, config.get_single(0))
+        M.comment_in_line(line_number, comment_string)
     end
 end
 
@@ -232,19 +232,37 @@ comments before starting to toggle comments, so for example in lua:
 `-- -- -- Test` would first become `-- -- Test`, then  `-- Test`, then finally
 `Test` and from then on alternate between that and `-- Test`.
 @tparam int line_number Line to operate on
+@tparam string mode State in enum (Defined by config), available states are:
+        - normal: This is the default, behave normally
+        - force_multi: Force the use of multi-line comment syntax (Prefix and Suffix)
+            regardless of how many lines are being operated on
+        - force_single: Force the use of single-line comment syntax (Prefix only)
+            regardless of how many lines are being operated on
+        All of these only have an effect when commenting in
 @treturn nil
 ]]
-function M.toggle_comment_line(line_number)
+function M.toggle_comment_line(line_number, mode)
     local comment_string = config.get_single(0)
-    -- If the language doesn't support single-line comments
-    if comment_string == false then
-        M.toggle_comment_range(line_number, line_number, true)
-        return nil
+    local modes = config.get_modes()
+    -- No specfic mode requested, so it can be changed
+    if mode == modes.normal then
+        -- If the language doesn't support single-line comments
+        if comment_string == false then
+            mode = modes.force_multi
+        end
     end
     if M.is_comment(line_number, line_number) then
-        M.comment_out_line(line_number, comment_string)
+        if mode == modes.force_multi then
+            M.comment_out_range(line_number, line_number, config.get_multi(0))
+        else
+            M.comment_out_line(line_number, comment_string)
+        end
     else
-        M.comment_in_line(line_number, comment_string)
+        if mode == modes.force_multi then
+            M.comment_in_range(line_number, line_number, config.get_multi(0))
+        else
+            M.comment_in_line(line_number, comment_string)
+        end
     end
 end
 
@@ -253,27 +271,39 @@ Toggles commenting on the range.
 Behaves the same way as toggeling a single line.
 @tparam int line_number_start Start of the range, inclusive
 @tparam int line_number_end End of the range, inclusive
-@tparam bool force_multi Force the use of multi-line comment prefix and suffix
+@tparam string mode State in enum (Defined by config), available states are:
+        - normal: This is the default, behave normally
+        - force_multi: Force the use of multi-line comment syntax (Prefix and Suffix)
+            regardless of how many lines are being operated on
+        - force_single: Force the use of single-line comment syntax (Prefix only)
+            regardless of how many lines are being operated on
+        All of these only have an effect when commenting in
 @treturn nil
 @see toggle_comment_line
 ]]
-function M.toggle_comment_range(line_number_start, line_number_end, force_multi)
+function M.toggle_comment_range(line_number_start, line_number_end, mode)
     --[[ If you start a selection and then move up, it would be detected
     as a negative range, so if that's the case swap the start and end. ]]
     if line_number_end < line_number_start then
         line_number_start, line_number_end = line_number_end, line_number_start
     end
     local comment_strings = config.get_multi(0)
+    local modes = config.get_modes()
+    -- No specfic mode requested, so it can be changed
+    if mode == modes.normal then
+        -- If the range is only 1 line long, force the use of single comments
+        if line_number_start == line_number_end then
+            mode = modes.force_single
+        end
+    end
     if M.is_comment(line_number_start, line_number_end) then
         M.comment_out_range(line_number_start, line_number_end, comment_strings)
     else
-        --[[ If the range is a single line, do a single-line comment toggle instead,
-        but only if trying to comment in since it could be annoying otherwise. ]]
-        if line_number_end == line_number_start and not force_multi then
-            M.toggle_comment_line(line_number_start)
-            return nil
+        if mode == modes.force_single then
+            M.comment_in_range_single(line_number_start, line_number_end, config.get_single(0))
+        else
+            M.comment_in_range(line_number_start, line_number_end, comment_strings)
         end
-        M.comment_in_range(line_number_start, line_number_end, comment_strings)
     end
 end
 

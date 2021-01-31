@@ -4,6 +4,7 @@ Configuration.
 This module contains the mappings of comment strings to filetypes, as well as
 convenience functions for retrieving configuration parameters.
 ]]
+local util = require("kommentary.util")
 local default = {"//", {"/*", "*/"}}
 local M = {}
 
@@ -111,6 +112,18 @@ Get the multi-line comment string for the given filetype.
 ]]
 function M.get_multi(filetype)
     return M.get_config(filetype)[2]
+end
+
+--[[--
+Get the enum for available modes.
+@treturn {{string,int},...} *Enum*
+]]
+function M.get_modes()
+    return util.enum( {
+        "normal",
+        "force_multi",
+        "force_single",
+        })
 end
 
 return M

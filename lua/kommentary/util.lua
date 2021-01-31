@@ -67,4 +67,26 @@ function M.escape_pattern(text)
     return text:gsub("([^%w])", "%%%1")
 end
 
+--[[--
+Basic enum functionality, kinda.
+You can use it like this:
+```lua
+local new_enum = enum({"normal", "force_multi", "force_single"})
+local mode = new_enum.force_single
+if mode == new_enum.normal then
+    print("In normal mode.")
+end
+```
+@tparam {string,...} items The names of the available states
+@treturn {{string,int},...} Table mapping each string to a number
+]]
+function M.enum(items)
+    local table = {}
+    for idx,val in ipairs(items) do
+        table[val] = idx
+    end
+    return table
+end
+
+
 return M
