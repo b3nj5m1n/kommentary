@@ -53,7 +53,7 @@ local config_table = {
     ["swift"] = default,
     ["vim"] = {"\"", false},
     ["clojure"] = {";", {"(comment ", " )"}},
-    ["fennnel"] = {";"}
+    ["fennnel"] = {";", false}
 }
 
 --[[--
