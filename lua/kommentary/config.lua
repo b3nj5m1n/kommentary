@@ -82,12 +82,10 @@ function M.config_from_commentstring(commentstring)
     end
     where = where - 1
     if where + #placeholder == #commentstring then
-        return { commentstring:sub(1, -#placeholder-1), false }
+        return {commentstring:sub(1, -#placeholder-1), false}
     end
-
-    return { false, { commentstring:sub(1, where),  commentstring:sub(where + #placeholder + 1, -1) } }
+    return {false, {commentstring:sub(1, where),  commentstring:sub(where + #placeholder + 1, -1)}}
 end
-
 
 --[[--
 Get the full config for the given filetype.
