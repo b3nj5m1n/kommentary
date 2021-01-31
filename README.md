@@ -27,9 +27,29 @@ Replace rust with the filetype you want to configure, the first field in the tab
 require('kommentary.config').config["rust"] = {"//", {"/*", "*/"}}
 ```
 
-## Documentation
+## Contributing
 
-The code is heavily commented, functions are documented with using [LDoc](https://github.com/lunarmodules/LDoc).
+Any and all contributions are greatly appreciated!
+
+### Issues
+
+If you found a bug or want to request a feature, pleases do so by [raising an issue](https://github.com/b3nj5m1n/kommentary/issues/new/choose).
+
+### Pull Requests
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Make your changes
+4. Run the unit tests if you changed anything affected by them
+5. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+6. Push to the Branch (`git push origin feature/AmazingFeature`)
+7. Open a Pull Request
+
+Please try your best to follow the style of the rest of the codebase, even though there's no official spec or linter for it.
+
+### Documentation
+
+The code is heavily commented, functions are documented using [LDoc](https://github.com/lunarmodules/LDoc).
 
 You can build the documentation with this command:
 ```
@@ -37,7 +57,7 @@ ldoc .
 ```
 Then you can access it from doc/index.html
 
-## Tests
+### Tests
 
 There are unit tests available in the directory `lua/test`, you'll need to have [luaunit](https://github.com/bluebird75/luaunit) installed, then run:
 ```sh
