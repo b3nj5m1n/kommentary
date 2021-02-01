@@ -4,19 +4,27 @@ Neovim plugin to comment text in and out, written in lua. Supports commenting ou
 
 ![](https://s2.gifyu.com/images/Peek-2021-01-30-23-12.gif)
 
-## Install
+## Getting started
 
-### Packer
+### Install
+
+You can install the plugin using your favorite plugin manager, just make sure you remove any plugins that might conflict with this one, such as vim-commentary.
+
+#### Packer
 
 ```lua
 use 'b3nj5m1n/kommentary'
 ```
 
-### Vim-Plug
+#### Vim-Plug
 
 ```viml
 Plug 'b3nj5m1n/kommentary'
 ```
+
+### Default Keybindings
+
+The default keybindings are the same as in vim-commentary. That means you an toggle comments for the current line using gcc, for the current visual selection using gc, and in combination with a motion using gc, for example gc5j.
 
 ## Configuration
 
