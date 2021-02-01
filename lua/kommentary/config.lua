@@ -15,16 +15,16 @@ M.context = util.enum({"line", "visual", "motion", "init"})
 --[[--
 Set up keymappings.
 Sets up <Plug>Kommentary, to this you should map the prefix you want to use for
-	motions, so for example if you want to be able to to gc5j to toggle comments
-	for the next 5 lines, do this: `nmap gc <Plug>Kommentary`.
+    motions, so for example if you want to be able to to gc5j to toggle comments
+    for the next 5 lines, do this: `nmap gc <Plug>Kommentary`.
 Sets up <Plug>KommentaryVisual, which is obviously for the visual mode mapping,
-	for example to be able to do gc in visual mode, do this mapping:
-	`vmap gc <Plug>KommentaryVisual`, this will leave you in visual mode after
-	toggeling comments, if you always want to go back to normal mode afterwards:
-	`vmap gc <Plug>KommentaryVisual<C-c>`
+    for example to be able to do gc in visual mode, do this mapping:
+    `vmap gc <Plug>KommentaryVisual`, this will leave you in visual mode after
+    toggeling comments, if you always want to go back to normal mode afterwards:
+    `vmap gc <Plug>KommentaryVisual<C-c>`
 Sets up <Plug>KommentaryLine, which is what you should use for commenting out single
-	lines, so if you want to be able to do gcc in normal mode to comment out the
-	line you're currently on, do this: `nmap gcc <Plug>KommentaryLine`
+    lines, so if you want to be able to do gcc in normal mode to comment out the
+    line you're currently on, do this: `nmap gcc <Plug>KommentaryLine`
 @treturn nil
 ]]
 function M.setup()
@@ -130,11 +130,11 @@ end
 --[[--
 Get the full config for the given filetype.
 @tparam string filetype Filetype to retrieve configuration for,
-	0 means infere by current buffer.
-	If the filetype doesn't have a configuration available,
-	the default configuration will be returned.
+    0 means infere by current buffer.
+    If the filetype doesn't have a configuration available,
+    the default configuration will be returned.
 @treturn {[string]={?bool|string,?bool|{string,string}}}
-	Full configuration for filetype
+    Full configuration for filetype
 ]]
 function M.get_config(filetype)
     if filetype == 0 then
@@ -152,9 +152,9 @@ end
 --[[--
 Get the single-line comment string for the given filetype.
 @tparam string filetype Filetype to retrieve configuration for,
-	0 means infere by current buffer.
-	If the filetype doesn't have a configuration available,
-	the default configuration will be returned.
+    0 means infere by current buffer.
+    If the filetype doesn't have a configuration available,
+    the default configuration will be returned.
 @treturn ?bool|string Single-line comment string for filetype
 ]]
 function M.get_single(filetype)
@@ -164,9 +164,9 @@ end
 --[[--
 Get the multi-line comment string for the given filetype.
 @tparam string filetype Filetype to retrieve configuration for,
-	0 means infere by current buffer.
-	If the filetype doesn't have a configuration available,
-	the default configuration will be returned.
+    0 means infere by current buffer.
+    If the filetype doesn't have a configuration available,
+    the default configuration will be returned.
 @treturn ?bool|{string,string} Multi-line comment strings for filetype
 ]]
 function M.get_multi(filetype)

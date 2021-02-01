@@ -26,14 +26,14 @@ the desired callback function were called `kommentary.toggle_comment_singles`,
 then you would call this function like this:
     `kommentary.go(context, {kommentary.toggle_comment_singles})`
 @tparam string ... Optional string indicating the mode to choose, 'single_line'
-	will operate on the current line, 'visual' will use the current visual
-	selection, otherwise it will assume a motion (Arguments will be
-	automatically passed by operatorfunc).
+    will operate on the current line, 'visual' will use the current visual
+    selection, otherwise it will assume a motion (Arguments will be
+    automatically passed by operatorfunc).
 @tparam ?string|function ... Optional function to call instead of the normal
 toggle_comment at the end of this function
 @treturn ?string|nil If called without arguments, it sets itself as operatorfunc
-	and returns 'g@' to be used in an expression mapping, otherwise it will
-	comment out and not return anything.
+    and returns 'g@' to be used in an expression mapping, otherwise it will
+    comment out and not return anything.
 ]]
 function M.go(...)
     local args = {...}
@@ -63,7 +63,7 @@ function M.go(...)
     end
     if calling_context == context.line then
         line_number_start = vim.api.nvim_win_get_cursor(0)[1]
-	line_number_end = line_number_start
+    line_number_end = line_number_start
     elseif calling_context == context.visual then
         --[[ vim.fn.getpos will return the position of something,
         if you pass 'v' as an argument you will get the start of a
@@ -76,8 +76,8 @@ function M.go(...)
     on what the motion operates, we use it to detect if this function
     is being called after a motion ]]
     elseif args[1] == "line" or
-	    args[1] == "char" or
-	    args[1] == "block" then
+        args[1] == "char" or
+        args[1] == "block" then
         --[[ When using g@, the marks [ and ] will contain the position of the
         start and the end of the motion, respectively. vim.fn.getpos() returns
         a tuple with the line and column of the position. ]]
@@ -86,9 +86,9 @@ function M.go(...)
         calling_context = context.motion
     end
     if callback_function == nil then
-	    M.toggle_comment(line_number_start, line_number_end, calling_context)
+        M.toggle_comment(line_number_start, line_number_end, calling_context)
     else
-	    callback_function(line_number_start, line_number_end, calling_context)
+        callback_function(line_number_start, line_number_end, calling_context)
     end
 end
 
@@ -98,7 +98,7 @@ function M.toggle_comment(...)
     local calling_context = args[3]
     local mode = modes.normal
     if calling_context == context.line then
-	    mode = modes.force_single
+        mode = modes.force_single
     end
     kommentary.toggle_comment_range(line_number_start, line_number_end, mode)
 end
