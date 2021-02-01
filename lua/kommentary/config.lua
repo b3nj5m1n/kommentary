@@ -7,6 +7,10 @@ convenience functions for retrieving configuration parameters.
 local util = require("kommentary.util")
 local default = {"//", {"/*", "*/"}}
 local M = {}
+--[[ These are the available modes that can be passed to
+`kommentary.go`, we need to choose the appropriate one for
+each mapping depending on the mode of the mapping ]]
+M.context = util.enum({"line", "visual", "motion", "init"})
 
 --[[--
 Set up keymappings.
@@ -24,9 +28,6 @@ Sets up <Plug>KommentaryLine, which is what you should use for commenting out si
 @treturn nil
 ]]
 function M.setup()
-    --[[ These are the available modes that can be passed to kommentary.go, we
-    need to choose the appropriate one depending on the mode of the mapping ]]
-    local modes = util.enum({"line", "visual", "motion", "init"})
     --[[ The naming convention for these keymappings is: <Plug>kommentary_mode_suffix
     where suffix is either default, if it's the default behaviour, or a keyword
     indicating what is special about this mapping, for example consider the
@@ -35,13 +36,13 @@ function M.setup()
     which would be multi-line comment-style if the range is longer than one line. ]]
     -- Defaults
     vim.api.nvim_set_keymap('n', '<Plug>kommentary_motion_default',
-        'v:lua.kommentary.go(' .. modes.init .. ')',
+        'v:lua.kommentary.go(' .. M.context.init .. ')',
         { noremap = true, expr = true })
     vim.api.nvim_set_keymap('n', '<Plug>kommentary_line_default',
-        '<cmd>call v:lua.kommentary.go(' .. modes.line .. ')<cr>',
+        '<cmd>call v:lua.kommentary.go(' .. M.context.line .. ')<cr>',
         { noremap = true, silent = true })
     vim.api.nvim_set_keymap('v', '<Plug>kommentary_visual_default',
-        '<cmd>call v:lua.kommentary.go(' .. modes.visual .. ')<cr>',
+        '<cmd>call v:lua.kommentary.go(' .. M.context.visual .. ')<cr>',
         { noremap = true, silent = true })
     -- Non-default, Motion
     --[[ Atm, we can't pass a custom callback function to kommentary.go through
@@ -52,7 +53,7 @@ function M.setup()
     -- Non-default, Line
     -- Non-default, Visual
     vim.api.nvim_set_keymap('v', '<Plug>kommentary_visual_singles',
-        '<cmd>lua require("kommentary");kommentary.go(' .. modes.visual .. ', '
+        '<cmd>lua require("kommentary");kommentary.go(' .. M.context.visual .. ', '
         .. "{kommentary.toggle_comment_singles}" .. ')<cr>',
         { noremap = true, silent = false })
 end

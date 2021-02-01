@@ -207,7 +207,6 @@ function M.comment_out_range(line_number_start, line_number_end, comment_strings
                 if i == #content then
                     -- This will make sure that only the last occurence of the suffix is replaced
                     local start_index = util.index_last_occurence(new_line, util.escape_pattern(comment_strings[2]))
-                    print(start_index)
                     new_line, _ = util.gsub_from_index(new_line, "%s*" .. util.escape_pattern(comment_strings[2]), "", 1, start_index-1)
                 end
                 result[i] = new_line
@@ -307,7 +306,7 @@ function M.toggle_comment_range(line_number_start, line_number_end, mode)
     elseif config.get_single(0) == false then
         mode = modes.force_multi
     end
-    -- The order of these checks should gurantee the correct mode is picked
+    -- The order of the checks above should gurantee the correct mode is picked
     if M.is_comment(line_number_start, line_number_end) then
         M.comment_out_range(line_number_start, line_number_end, comment_strings)
     else
