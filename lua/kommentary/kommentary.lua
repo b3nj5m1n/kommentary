@@ -67,37 +67,37 @@ Checks if the specified range in the buffer is a comment.
 ]]
 function M.is_comment(line_number_start, line_number_end)
     line_number_start = line_number_start-1
+    local result = nil
     -- Get the content of the range specififed, this will return a table of lines
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     -- Check whether the range is a single- or multiline range, get the appropriate comment_string
+    local comment_string = nil
     if #content == 1 then
-        local comment_string = config.get_single(0)
+        comment_string = config.get_single(0)
         if not comment_string == false then
-            return M.is_comment_single(content[1], comment_string)
-        else
+            result = M.is_comment_single(content[1], comment_string)
+        end
+        if not result == true then
             -- In case the language doesn't support single-line comments
             comment_string = config.get_multi(0)
-            return M.is_comment_multi(content, comment_string)
+            result = M.is_comment_multi(content, comment_string)
         end
     elseif #content > 1 then
-        local comment_string = config.get_multi(0)
-        local result = M.is_comment_multi(content, comment_string)
+        comment_string = config.get_multi(0)
+        result = M.is_comment_multi(content, comment_string)
         -- If the language doesn't support multiline comments, or
         -- if the lines are not a multiline comment,
         -- they might still be multiple single-line comments
-        if result then
-            return result
-        else
+        if not result == true then
             comment_string = config.get_single(0)
-            if comment_string == false then
-                return result
-            else
-                return M.is_comment_multi_single(content, comment_string)
+            if not comment_string == false then
+                result = M.is_comment_multi_single(content, comment_string)
             end
         end
     else
         error("Empty range.")
     end
+    return result
 end
 
 --[[--
@@ -191,23 +191,23 @@ normal code, but remove one *level* of commenting instead.
 @treturn nil
 @see comment_out_line
 ]]
-function M.comment_out_range(line_number_start, line_number_end, comment_string)
+function M.comment_out_range(line_number_start, line_number_end, comment_strings)
     line_number_start = line_number_start-1
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     -- If the range consists of multiple single-line comments
-    local single_comments_array = comment_string == false
-    if not comment_string == false then
-        if M.is_comment_multi(content, comment_string) then
+    local single_comments_array = comment_strings == false
+    if not single_comments_array then
+        if M.is_comment_multi(content, comment_strings) then
             local result = {}
             for i, line in ipairs(content) do
                 local new_line = line
                 if i == 1 then
-                    new_line, _ = string.gsub(new_line, util.escape_pattern(comment_string[1]) .. "%s*", "", 1)
+                    new_line, _ = string.gsub(new_line, util.escape_pattern(comment_strings[1]) .. "%s*", "", 1)
                 end
                 if i == #content then
                     -- This will make sure that only the last occurence of the suffix is replaced
-                    local start_index = util.index_last_occurence(line, comment_string[2])
-                    new_line, _ = util.gsub_from_index(new_line, "%s*" .. util.escape_pattern(comment_string[2]), "", 1, start_index)
+                    local start_index = util.index_last_occurence(new_line, util.escape_pattern(comment_strings[2]))
+                    new_line, _ = util.gsub_from_index(new_line, "%s*" .. util.escape_pattern(comment_strings[2]), "", 1, start_index-1)
                 end
                 result[i] = new_line
             end
@@ -294,20 +294,19 @@ function M.toggle_comment_range(line_number_start, line_number_end, mode)
     local modes = config.get_modes()
     -- No specfic mode requested, so it can be changed
     if mode == modes.normal then
-        -- If the range is only 1 line long, force the use of single comments
-        if line_number_start == line_number_end then
-            mode = modes.force_single
-        end
-        -- If the language doesn't support multi-line comments
-        if comment_strings == false then
-            mode = modes.force_single
-        end
-        -- If the language doesn't support single-line comments
-        if config.get_single(0) == false then
-            mode = modes.force_multi
-        end
-        -- The order of these checks should gurantee the correct mode is picked
+	    -- If the range is only 1 line long, force the use of single comments
+	    if line_number_start == line_number_end then
+		    mode = modes.force_single
+	    end
     end
+    -- If the language doesn't support multi-line comments
+    if comment_strings == false then
+        mode = modes.force_single
+    -- If the language doesn't support single-line comments
+    elseif config.get_single(0) == false then
+        mode = modes.force_multi
+    end
+    -- The order of the checks above should gurantee the correct mode is picked
     if M.is_comment(line_number_start, line_number_end) then
         M.comment_out_range(line_number_start, line_number_end, comment_strings)
     else
