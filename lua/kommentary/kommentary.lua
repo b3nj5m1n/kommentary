@@ -133,13 +133,17 @@ end
 Turns the range into multiple single-line comments.
 @tparam int line_number_start Start of the range, inclusive
 @tparam int line_number_end End of the range, inclusive
+@tparam string comment_string The prefix of a single-line comment
 @treturn nil
 ]]
 function M.comment_in_range_single(line_number_start, line_number_end, comment_string)
     line_number_start = line_number_start-1
-    for line_number = line_number_start+1, line_number_end, 1 do
-        M.comment_in_line(line_number, comment_string)
+    local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
+    local result = {}
+    for _, line in ipairs(content) do
+        table.insert(result, util.insert_at_beginning(line, comment_string .. " "))
     end
+    vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
 end
 
 --[[--
@@ -176,6 +180,24 @@ function M.comment_in_range(line_number_start, line_number_end, comment_string)
         end
         vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
     end
+end
+
+--[[--
+Turns the range, multiple single-line comments, into normal code.
+@tparam int line_number_start Start of the range, inclusive
+@tparam int line_number_end End of the range, inclusive
+@tparam string comment_string The prefix of a single-line comment
+@treturn nil
+]]
+function M.comment_out_range_single(line_number_start, line_number_end, comment_string)
+    line_number_start = line_number_start-1
+    local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
+    local result = {}
+    for _, line in ipairs(content) do
+        local new_line, _ = string.gsub(line, util.escape_pattern(comment_string) .. "%s*", "", 1)
+        table.insert(result, new_line)
+    end
+    vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
 end
 
 --[[--
@@ -217,12 +239,11 @@ function M.comment_out_range(line_number_start, line_number_end, comment_strings
         end
     end
     if single_comments_array then
-        -- The language doesn't support multi-line comments, or the
-        -- range just doesn't use them, either way: loop over each
-        -- line and comment it out with a single-line comment
-        for line_number = line_number_start+1, line_number_end, 1 do
-            M.comment_out_line(line_number, config.get_single(0))
-        end
+        --[[ The language doesn't support multi-line comments, or the
+        range just doesn't use them. Because comment_out_range_single
+        also subracts one from the line_number_start, we have to add it
+        back here as to not end up with a subraction of 2 ]]
+        M.comment_out_range_single(line_number_start+1, line_number_end, config.get_single(0))
     end
 end
 
