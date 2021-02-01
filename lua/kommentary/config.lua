@@ -24,11 +24,37 @@ Sets up <Plug>KommentaryLine, which is what you should use for commenting out si
 @treturn nil
 ]]
 function M.setup()
+    --[[ These are the available modes that can be passed to kommentary.go, we
+    need to choose the appropriate one depending on the mode of the mapping ]]
     local modes = util.enum({"line", "visual", "motion", "init"})
-    vim.api.nvim_set_keymap('n', '<Plug>Kommentary', 'v:lua.kommentary.go(' .. modes.init .. ')', { noremap = true, expr = true })
-    vim.api.nvim_set_keymap('n', '<Plug>KommentaryLine', '<cmd>call v:lua.kommentary.go(' .. modes.line .. ')<cr>', { noremap = true, silent = true })
-    vim.api.nvim_set_keymap('v', '<Plug>KommentaryVisual', '<cmd>call v:lua.kommentary.go(' .. modes.visual .. ')<cr>', { noremap = true, silent = true })
-    vim.api.nvim_set_keymap('v', '<Plug>KommentaryVisualSingles', '<cmd>lua require("kommentary");kommentary.go(' .. modes.visual .. ', ' .. "{kommentary.toggle_comment_singles}" .. ')<cr>', { noremap = true, silent = false })
+    --[[ The naming convention for these keymappings is: <Plug>kommentary_mode_suffix
+    where suffix is either default, if it's the default behaviour, or a keyword
+    indicating what is special about this mapping, for example consider the
+    mapping `<Plug>kommentary_visual_singles`, this is a mapping for visual mode
+    which will always use single-line comment style, instead of the default,
+    which would be multi-line comment-style if the range is longer than one line. ]]
+    -- Defaults
+    vim.api.nvim_set_keymap('n', '<Plug>kommentary_motion_default',
+        'v:lua.kommentary.go(' .. modes.init .. ')',
+        { noremap = true, expr = true })
+    vim.api.nvim_set_keymap('n', '<Plug>kommentary_line_default',
+        '<cmd>call v:lua.kommentary.go(' .. modes.line .. ')<cr>',
+        { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('v', '<Plug>kommentary_visual_default',
+        '<cmd>call v:lua.kommentary.go(' .. modes.visual .. ')<cr>',
+        { noremap = true, silent = true })
+    -- Non-default, Motion
+    --[[ Atm, we can't pass a custom callback function to kommentary.go through
+    a motion, from trying it out it seems as if you need to set the operatorfunc
+    to a function, but without (), i.e. `v:lua.kommentary.go` instead of
+    `v:lua.kommentary.go()`, because in the second example the function just
+    wouldn't be called at all. Hopefully I missed something in the documentation. ]]
+    -- Non-default, Line
+    -- Non-default, Visual
+    vim.api.nvim_set_keymap('v', '<Plug>kommentary_visual_singles',
+        '<cmd>lua require("kommentary");kommentary.go(' .. modes.visual .. ', '
+        .. "{kommentary.toggle_comment_singles}" .. ')<cr>',
+        { noremap = true, silent = false })
 end
 
 --[[--
