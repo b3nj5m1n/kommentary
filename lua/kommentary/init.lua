@@ -5,7 +5,6 @@ This module handles the initialization of the plugin.
 ]]
 local kommentary = require("kommentary.kommentary")
 local config = require("kommentary.config")
-local util = require("kommentary.util")
 local M = {}
 local context = config.context
 local modes = config.get_modes()
