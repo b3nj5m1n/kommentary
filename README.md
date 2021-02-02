@@ -50,7 +50,7 @@ If one of those two is not supported by the language, set the value to false, ot
 
 ### Always use single/multi-line comments
 
-Some languages might technically support multi-line comments but have some quirks with them, or maybe you just prefer single-line comments. The easy way to configure this is:
+Some languages might technically support multi-line comments but have some quirks with them, or maybe you just prefer single-line comments. The proper way to configure this is:
 
 ```lua
 lua << EOF

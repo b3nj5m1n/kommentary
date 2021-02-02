@@ -24,8 +24,8 @@ The value is the configuration for that filetype, a table containing:
         meaning single-line comments will be used when available.
     * A bool, if set to true consistent indentation will be used in
         multi-single comments.
-A language will be put in here, if the commentstring is not defined, or if it
-supports both single-line and multi-line comments. For example:
+A language will get an explicit configuration here if the commentstring is not defined,
+or if it supports both single-line and multi-line comments. For example:
     * bash doesn't get in, it only supports single-line comments and the
         commentstring is set correctly for it.
     * c does get in because it supports both single-line and multi-line
@@ -120,7 +120,7 @@ Interface for creating configuration entries.
                 --     print("Multi-single-line comment, consistent indentation.")
                 -- end
                 ```
-        dont_fill_defaults  by default, for option not provided in the options table,
+        dont_fill_defaults  by default, for options not provided in the options table,
             the option will be set according to the default value of that option,
             if this option is present, options not provided will be left at nil.
 ]]
@@ -234,16 +234,16 @@ end
 
 --[[--
 Decide which mode should ultimately be used.
-If the function has been called with something other than mode.normal, will be
-    what is used and is immediately returned.
+If the function has been called with something other than mode.normal, that will be
+    what is used and it is immediately returned.
 If line_number_start and line_number_end are the same, so if the range is only
-    a single line long, single lines will be forced.
+    a single line long, single-line comments will be used.
 If a default mode other than modes.normal has been set for the language, the mode
-    will be set to that default mode now. (Overwrites previous)
+    will be set to that default mode. (Overwrites previous)
 If the language doesn't support multi-line comments,
-    single-lines will be forced. (Overwrites previous)
+    single-lines will be used. (Overwrites previous)
 If the language doesn't support single line comments,
-    multi-line comments will be forced. (Overwrites previous)
+    multi-line comments will be used. (Overwrites previous)
 @treturn int *Enum*
 ]]
 function M.get_mode(line_number_start, line_number_end, mode)
