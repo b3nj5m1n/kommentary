@@ -22,9 +22,9 @@ The key in the table is the filetype for which the configuration should take eff
 The value is the configuration for that filetype, a table containing:
     * The prefix to be used for single-line comments.
     * A table containing the prefix and suffix to be used for multi-line comments.
-    * A bool, if set to true the default mode will be set to force_multi,
+    * A bool, if set to true the default mode will be set to prefer_multi,
         meaning multi-line comments will be used when available.
-    * A bool, if set to true the default mode will be set to force_single,
+    * A bool, if set to true the default mode will be set to prefer_single,
         meaning single-line comments will be used when available.
     * A bool, if set to true consistent indentation will be used in
         multi-single comments.
