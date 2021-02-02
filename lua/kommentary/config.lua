@@ -190,8 +190,8 @@ function M.config_from_commentstring(commentstring)
             false, false, false, true}
     end
     return {false, {util.trim(commentstring:sub(1, index_placeholder)),
-        util.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1)),
-        false, false, true}}
+        util.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1))},
+        false, false, true}
 end
 
 --[[--
