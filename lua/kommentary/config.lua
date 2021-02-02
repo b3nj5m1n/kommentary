@@ -72,6 +72,8 @@ Sets up <Plug>KommentaryLine, which is what you should use for commenting out si
 @treturn nil
 ]]
 function M.setup()
+    -- This is the global variable holding the callback function to be called by go()
+    vim.api.nvim_set_var("kommentary_callback_function", nil)
     --[[ The naming convention for these keymappings is: <Plug>kommentary_mode_suffix
     where suffix is either default, if it's the default behaviour, or a keyword
     indicating what is special about this mapping, for example consider the
@@ -89,17 +91,16 @@ function M.setup()
         '<cmd>call v:lua.kommentary.go(' .. M.context.visual .. ')<cr>',
         { noremap = true, silent = true })
     -- Non-default, Motion
-    --[[ Atm, we can't pass a custom callback function to kommentary.go through
-    a motion, from trying it out it seems as if you need to set the operatorfunc
-    to a function, but without (), i.e. `v:lua.kommentary.go` instead of
-    `v:lua.kommentary.go()`, because in the second example the function just
-    wouldn't be called at all. Hopefully I missed something in the documentation. ]]
+    vim.api.nvim_set_keymap('n', '<Plug>kommentary_motion_singles',
+        'v:lua.kommentary.go(' .. M.context.init .. ', ' ..
+        "'kommentary.toggle_comment_singles'" .. ')',
+        { noremap = true, expr = true })
     -- Non-default, Line
     -- Non-default, Visual
     vim.api.nvim_set_keymap('v', '<Plug>kommentary_visual_singles',
         '<cmd>lua require("kommentary");kommentary.go(' .. M.context.visual .. ', '
-        .. "{kommentary.toggle_comment_singles}" .. ')<cr>',
-        { noremap = true, silent = false })
+        .. "'kommentary.toggle_comment_singles'" .. ')<cr>',
+        { noremap = true, silent = true })
 end
 
 --[[--

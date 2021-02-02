@@ -9,6 +9,24 @@ local M = {}
 local context = config.context
 local modes = config.get_modes()
 
+--[[ Since no custom arguments can be passed to operatorfunc, we need to store a
+potential custom callback function on initialization ]]
+--[[--
+Sets the global callback function.
+@tparam string callback_function the name of the function to be called by go()
+        Only put the function name, no () or args
+]]
+function M.set_callback_function(callback_function)
+    vim.api.nvim_set_var("kommentary_callback_function", callback_function)
+end
+--[[--
+Retrieves the global callback function.
+@treturn string returns the name of the global callback function
+]]
+function M.get_callback_function()
+    return vim.api.nvim_get_var("kommentary_callback_function")
+end
+
 --[[--
 Function to be called by mappings.
 This function should be called by all the mappings, it will figure out two things:
@@ -42,11 +60,10 @@ function M.go(...)
     local calling_context = args[1]
     local line_number_start = nil
     local line_number_end = nil
-    local callback_function = args[2]
-    --[[ If the second argument is not nil, it's a table containing the callback
-    function, extract that function from the table, otherwise leave it as nil ]]
-    if type(callback_function) == "table" then
-        callback_function = callback_function[1]
+    --[[ If the second argument is not nil, it's a string representing the name
+    of the new callback function ]]
+    if type(args[2]) == "string" then
+        M.set_callback_function(args[2])
     end
     --[[ When called with the calling context of init (This would be for triggered
     by gc for example) return g@ (Which has to be inserted into the mapping literaly,
@@ -85,11 +102,30 @@ function M.go(...)
         line_number_end = vim.fn.getpos("']")[2]
         calling_context = context.motion
     end
-    if callback_function == nil then
+    if M.get_callback_function() == nil then
         M.toggle_comment(line_number_start, line_number_end, calling_context)
     else
-        callback_function(line_number_start, line_number_end, calling_context)
+        --[[ Looks pretty bad, doesn't it. So when you set operatorfunc, you have to
+        put the name of the function, without any () since when you press g@,
+        vim will automatically pass an argument to the operatorfunc. This means
+        that we can't specify any arguments for the go function when we're calling
+        from a motion. Because of that, we store the function in a global variable,
+        but we can't simply use the function there, because that can't be properly
+        converted to viml internally, meaning we store the function name instead.
+        But now we have to call that function, and the way we do that is using
+        lua's load function, which is essentially an eval(), meaning it executes
+        lua code from a string. Only that it doesn't execute the code, but it turns
+        it into a callable function, and if you execute the return of load() as
+        a function, what was in the string gets executed, provided that it was a
+        proper function call. So, here we string together said function call.
+        Now writing this, I probably missed something really obvious, didn't I? ]]
+        local callback_function = load(M.get_callback_function()
+            ..  '(' .. line_number_start .. ', ' .. line_number_end
+            .. ', ' .. calling_context .. ')')
+        callback_function()
     end
+    -- We need to make sure we unset the callaback function now.
+    M.set_callback_function(nil)
 end
 
 function M.toggle_comment(...)
