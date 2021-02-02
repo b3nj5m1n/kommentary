@@ -5,6 +5,10 @@ This module contains the mappings of comment strings to filetypes, as well as
 convenience functions for retrieving configuration parameters.
 ]]
 local util = require("kommentary.util")
+--[[ The default values that will be used if commentstring isn't set,
+and that will be used to fill in any missing values in user configuration.  Read:
+single-line commentstring, multi-line commentstring, prefer multi-line comments,
+prefer single-line comments, use consistent indentation. ]]
 local default = {"//", {"/*", "*/"}, false, false, true}
 local M = {}
 --[[ These are the available modes that can be passed to
