@@ -313,21 +313,7 @@ function M.toggle_comment_range(line_number_start, line_number_end, mode)
     end
     local comment_strings = config.get_multi(0)
     local modes = config.get_modes()
-    -- No specfic mode requested, so it can be changed
-    if mode == modes.normal then
-        -- If the range is only 1 line long, force the use of single comments
-        if line_number_start == line_number_end then
-            mode = modes.force_single
-        end
-    end
-    -- If the language doesn't support multi-line comments
-    if comment_strings == false then
-        mode = modes.force_single
-    -- If the language doesn't support single-line comments
-    elseif config.get_single(0) == false then
-        mode = modes.force_multi
-    end
-    -- The order of the checks above should gurantee the correct mode is picked
+    mode = config.get_mode(line_number_start, line_number_end, mode)
     if M.is_comment(line_number_start, line_number_end) then
         M.comment_out_range(line_number_start, line_number_end, comment_strings)
     else

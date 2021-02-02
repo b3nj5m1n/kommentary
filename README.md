@@ -28,11 +28,57 @@ The default keybindings are the same as in vim-commentary. That means you an tog
 
 ## Configuration
 
+The config module provides a convenience function called `configure_language` which helps in configuring a language.
+
 ### Configure unsupported language
 
-Replace rust with the filetype you want to configure, the first field in the table with the prefix for single-line comments (A whitespace character gets added by default after a prefix and before a suffix) or false if the language doesn't support single-line comments, and the second field with a table containing the prefix and suffix for multi-line comments (including whitespace) or false if the language doesn't support multi-line comments.
+Most languages have basic support out of the box, thanks to `commentstring`, however for some languages `commentstring` is not set, and `commentstring` supports either single-line or multi-line comments, not both.
+For those reasons, you might prefer to properly configure a language. You can do it like this:
+
 ```lua
-require('kommentary.config').config["rust"] = {"//", {"/*", "*/"}}
+lua << EOF
+require('kommentary.config').configure_language("rust", {
+    single_line_comment = "//",
+    multi_line_comment = {"/*", "*/"},
+})
+EOF
+```
+
+If one of those two is not supported by the language, set the value to false, otherwise the default (`//` for single-line and `{/*,*/}` for multi-line) will be used.
+
+### Always use single/multi-line comments
+
+Some languages might technically support multi-line comments but have some quirks with them, or maybe you just prefer single-line comments. The easy way to configure this is:
+
+```lua
+lua << EOF
+require('kommentary.config').configure_language("rust", {
+    prefer_single_line_comments = true,
+})
+EOF
+```
+
+It also works the other way:
+
+```lua
+lua << EOF
+require('kommentary.config').configure_language("rust", {
+    prefer_multi_line_comments = true,
+})
+EOF
+```
+
+Please note that this is considered advise to the plugin, so there are cases in which multi-line comments will be used, for example if the multi-line comment string is set to false. You shouldn't worry about this, since you shouldn't encounter it during normal use.
+
+If you wish to completely disable any of these two, under all circumstances (Again, this shouldn't be necessary), you can simply set the multi-line comment string to false:
+
+```lua
+lua << EOF
+require('kommentary.config').configure_language("rust", {
+    single_line_comment = "//",
+    multi_line_comment = false,
+})
+EOF
 ```
 
 ## Contributing

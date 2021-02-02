@@ -18,8 +18,10 @@ The key in the table is the filetype for which the configuration should take eff
 The value is the configuration for that filetype, a table containing:
     * The prefix to be used for single-line comments.
     * A table containing the prefix and suffix to be used for multi-line comments.
-    * A bool, if set to true the use of single-line comments will be enforced.
-    * A bool, if set to true the use of multi-line comments will be enforced.
+    * A bool, if set to true the default mode will be set to force_multi,
+        meaning multi-line comments will be used when available.
+    * A bool, if set to true the default mode will be set to force_single,
+        meaning single-line comments will be used when available.
     * A bool, if set to true consistent indentation will be used in
         multi-single comments.
 A language will be put in here, if the commentstring is not defined, or if it
@@ -102,9 +104,9 @@ Interface for creating configuration entries.
 @tparam table options The options to set, possible values:
         single_line_comment_string (string) the prefix for single-line comments
         multi_line_comment_strings (string tuple) the prefix and suffix
-        force_single_line_comments (bool) if true, always force the use of
+        prefer_single_line_comments (bool) if true, prefer the use of
             single-line comments
-        force_multi_line_comments (bool) if true, always force the use
+        prefer_multi_line_comments (bool) if true, prefer the use
             of multi-line comments
         use_consistent_indentation (bool) if true, use the outer-most indentation
             level for all single-line comments in a multi-single-line comment:
@@ -138,13 +140,13 @@ function M.configure_language(language, options)
     elseif not dont_fill_defaults then
         result[2] = default[2]
     end
-    if options.force_single_line_comments ~= nil then
-        result[3] = options.force_single_line_comments
+    if options.prefer_single_line_comments ~= nil then
+        result[3] = options.prefer_single_line_comments
     elseif not dont_fill_defaults then
         result[3] = default[3]
     end
-    if options.force_multi_line_comments ~= nil then
-        result[4] = options.force_multi_line_comments
+    if options.prefer_multi_line_comments ~= nil then
+        result[4] = options.prefer_multi_line_comments
     elseif not dont_fill_defaults then
         result[4] = default[4]
     end
@@ -180,10 +182,12 @@ function M.config_from_commentstring(commentstring)
     --[[ Test if the commentstring is a single-line or multi-line comment,
     extract the appropriate fields into a table ]]
     if index_placeholder + #placeholder == #commentstring then
-        return {util.trim(commentstring:sub(1, -#placeholder-1)), false}
+        return {util.trim(commentstring:sub(1, -#placeholder-1)),
+            false, false, false, true}
     end
-    return {false, {util.trim(commentstring:sub(1, index_placeholder),
-        commentstring:sub(index_placeholder + #placeholder + 1, -1))}}
+    return {false, {util.trim(commentstring:sub(1, index_placeholder)),
+        util.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1)),
+        false, false, true}}
 end
 
 --[[--
@@ -206,6 +210,66 @@ function M.get_config(filetype)
             and M.config_from_commentstring(vim.bo.commentstring) or default
     end
     return M.config[filetype]
+end
+
+--[[--
+Get the default mode (Prefer either multi or single line comments, or neither).
+@treturn int *Enum*
+]]
+function M.get_default_mode(filetype)
+    local config = M.get_config(filetype)
+    local modes = M.get_modes()
+    --[[ If both prefer_multi and prefer_single are set, or if none of them are
+    set, use the default mode. ]]
+    if (config[3] and config[4]) or (not config[3] and not config[4]) then
+        return modes.normal
+    end
+    if config[3] then
+        return modes.force_single
+    end
+    if config[4] then
+        return modes.force_multi
+    end
+end
+
+--[[--
+Decide which mode should ultimately be used.
+If the function has been called with something other than mode.normal, will be
+    what is used and is immediately returned.
+If line_number_start and line_number_end are the same, so if the range is only
+    a single line long, single lines will be forced.
+If a default mode other than modes.normal has been set for the language, the mode
+    will be set to that default mode now. (Overwrites previous)
+If the language doesn't support multi-line comments,
+    single-lines will be forced. (Overwrites previous)
+If the language doesn't support single line comments,
+    multi-line comments will be forced. (Overwrites previous)
+@treturn int *Enum*
+]]
+function M.get_mode(line_number_start, line_number_end, mode)
+    local modes = M.get_modes()
+    local config = M.get_config(0)
+    --[[ The function was called with something non-default,
+    this overwrites everything else. ]]
+    if mode ~= modes.normal then
+        return mode
+    end
+    -- If the range is only 1 line long, use single-line comments
+    if line_number_start == line_number_end then
+        mode = modes.force_single
+    end
+    local default_mode = M.get_default_mode(0)
+    if default_mode ~= modes.normal then
+        mode = default_mode
+    end
+    -- If the language doesn't support multi-line comments
+    if config[2] == false then
+        mode = modes.force_single
+    -- If the language doesn't support single-line comments
+    elseif config[1] == false then
+        mode = modes.force_multi
+    end
+    return mode
 end
 
 --[[--
