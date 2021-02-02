@@ -218,6 +218,7 @@ end
 
 --[[--
 Get the default mode (Prefer either multi or single line comments, or neither).
+@tparam string filetype The filetype for which to retrieve the default mode
 @treturn int *Enum*
 ]]
 function M.get_default_mode(filetype)
