@@ -28,7 +28,7 @@ The default keybindings are the same as in vim-commentary. That means you an tog
 
 ## Configuration
 
-The config module provides a convenience function called `configure_language` which helps in configuring a language.
+The config module provides a convenience function called `configure_language` which makes it easy to configure a language.
 
 ### Configure unsupported language
 
