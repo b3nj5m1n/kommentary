@@ -20,8 +20,9 @@ M.context = util.enum({"line", "visual", "motion", "init"})
 The default configuration, will be overwriten by user defined config.
 The key in the table is the filetype for which the configuration should take effect.
 The value is the configuration for that filetype, a table containing:
-    * The prefix to be used for single-line comments.
-    * A table containing the prefix and suffix to be used for multi-line comments.
+    * The prefix to be used for single-line comments, or "auto" for using commenstring.
+    * A table containing the prefix and suffix to be used for multi-line comments,
+        or "auto" for using commenstring.
     * A bool, if set to true the default mode will be set to prefer_multi,
         meaning multi-line comments will be used when available.
     * A bool, if set to true the default mode will be set to prefer_single,
@@ -46,14 +47,14 @@ M.config = {
     ["haskell"] = {"--", {"{-", "-}"}, false, false, true, true},
     ["java"] = default,
     ["javascript"] = default,
-    ["javascriptreact"] = default,
+    ["javascriptreact"] = {"auto", "auto", false, false, true, true},
     ["kotlin"] = default,
     ["lua"] = {"--", {"--[[", "]]"}, false, false, true, true},
     ["rust"] = default,
     ["sql"] = {"--", {"/*", "*/"}, false, false, true, true},
     ["swift"] = default,
     ["typescript"] = default,
-    ["typescriptreact"] = default,
+    ["typescriptreact"] = {"auto", "auto", false, false, true, true},
 }
 
 --[[--
@@ -239,7 +240,14 @@ function M.get_config(filetype)
         return filetype == vim.bo.filetype
             and M.config_from_commentstring(vim.bo.commentstring) or default
     end
-    return M.config[filetype]
+    local result = {unpack(M.config[filetype])}
+    if result[1] == "auto" then
+        result[1] = M.config_from_commentstring(vim.bo.commentstring)[1]
+    end
+    if result[2] == "auto" then
+        result[2] = M.config_from_commentstring(vim.bo.commentstring)[2]
+    end
+    return result
 end
 
 --[[--
