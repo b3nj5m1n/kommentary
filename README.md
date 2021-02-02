@@ -32,7 +32,9 @@ The config module provides a convenience function called `configure_language` wh
 
 ### Configure unsupported language
 
-Most languages have basic support out of the box, thanks to `commentstring`, however for some languages `commentstring` is not set, and `commentstring` supports either single-line or multi-line comments, not both.
+Most languages have basic support out of the box, thanks to `commentstring`.
+Unfortunately however, for some languages `commentstring` is not set.
+Also, `commentstring` supports either single-line or multi-line comments, not both.
 For those reasons, you might prefer to properly configure a language. You can do it like this:
 
 ```lua
