@@ -5,12 +5,50 @@ This module contains the mappings of comment strings to filetypes, as well as
 convenience functions for retrieving configuration parameters.
 ]]
 local util = require("kommentary.util")
-local default = {"//", {"/*", "*/"}}
+local default = {"//", {"/*", "*/"}, false, false, true}
 local M = {}
 --[[ These are the available modes that can be passed to
 `kommentary.go`, we need to choose the appropriate one for
 each mapping depending on the mode of the mapping ]]
 M.context = util.enum({"line", "visual", "motion", "init"})
+
+--[[--
+The default configuration, will be overwriten by user defined config.
+The key in the table is the filetype for which the configuration should take effect.
+The value is the configuration for that filetype, a table containing:
+    * The prefix to be used for single-line comments.
+    * A table containing the prefix and suffix to be used for multi-line comments.
+    * A bool, if set to true the use of single-line comments will be enforced.
+    * A bool, if set to true the use of multi-line comments will be enforced.
+    * A bool, if set to true consistent indentation will be used in
+        multi-single comments.
+A language will be put in here, if the commentstring is not defined, or if it
+supports both single-line and multi-line comments. For example:
+    * bash doesn't get in, it only supports single-line comments and the
+        commentstring is set correctly for it.
+    * c does get in because it supports both single-line and multi-line
+        comments.
+    * fennel does get in because the commentstring isn't set for it.
+]]
+M.config = {
+    ["c"] = default,
+    ["clojure"] = {";", {"(comment ", " )"}, false, false, true},
+    ["cpp"] = default,
+    ["cs"] = default,
+    ["fennel"] = {";", false, false, false, true},
+    ["go"] = default,
+    ["haskell"] = {"--", {"{-", "-}"}, false, false, true},
+    ["java"] = default,
+    ["javascript"] = default,
+    ["javascriptreact"] = default,
+    ["kotlin"] = default,
+    ["lua"] = {"--", {"--[[", "]]"}, false, false, true},
+    ["rust"] = default,
+    ["sql"] = {"--", {"/*", "*/"}, false, false, true},
+    ["swift"] = default,
+    ["typescript"] = default,
+    ["typescriptreact"] = default,
+}
 
 --[[--
 Set up keymappings.
@@ -59,43 +97,64 @@ function M.setup()
 end
 
 --[[--
-Table mapping filetypes to comment strings.
-Configuration for each filetype, the first field is the prefix for a single
-line comment, the second field is either false, if multi-line comments aren't
-supported by that filetype, or a table where the first field is the prefix
-for a multi-line comment and the second field is the suffix. Note that the very
-first field can also be false, if a language always requires a pre- and suffix.
-Newlines are not allowed, since they can't be matched when commenting out.
+Interface for creating configuration entries.
+@tparam string language The name of the language
+@tparam table options The options to set, possible values:
+        single_line_comment_string (string) the prefix for single-line comments
+        multi_line_comment_strings (string tuple) the prefix and suffix
+        force_single_line_comments (bool) if true, always force the use of
+            single-line comments
+        force_multi_line_comments (bool) if true, always force the use
+            of multi-line comments
+        use_consistent_indentation (bool) if true, use the outer-most indentation
+            level for all single-line comments in a multi-single-line comment:
+                ```lua
+                -- function test()
+                    -- print("Multi-single-line comment, inconsistent indentation.")
+                -- end
+                ```
+                ```lua
+                -- function test()
+                --     print("Multi-single-line comment, consistent indentation.")
+                -- end
+                ```
+        dont_fill_defaults  by default, for option not provided in the options table,
+            the option will be set according to the default value of that option,
+            if this option is present, options not provided will be left at nil.
 ]]
-M.config = {
-    ["bash"] = {"#", false},
-    ["c"] = default,
-    ["clojure"] = {";", {"(comment ", " )"}},
-    ["cpp"] = default,
-    ["cs"] = default,
-    ["fennel"] = {";", false},
-    ["fish"] = {"#", false},
-    ["go"] = default,
-    ["haskell"] = {"--", {"{-", "-}"}},
-    ["java"] = default,
-    ["javascript"] = default,
-    ["javascriptreact"] = default,
-    ["kotlin"] = default,
-    ["lua"] = {"--", {"--[[", "]]"}},
-    ["markdown"] = {false, {"<!---", "-->"}},
-    ["perl"] = {"#", false},
-    ["python"] = {"#", false},
-    ["r"] = {"#", false},
-    ["ruby"] = {"#", false},
-    ["rust"] = default,
-    ["sh"] = {"#", false},
-    ["sql"] = {"--", false},
-    ["swift"] = default,
-    ["typescript"] = default,
-    ["typescriptreact"] = default,
-    ["vim"] = {"\"", false},
-    ["zsh"] = {"#", false},
-}
+function M.configure_language(language, options)
+    local result = {nil, nil, nil, nil, nil}
+    local dont_fill_defaults = options.dont_fill_defaults ~= nil
+    --[[ For every option available, test if it present in the provided options table,
+    if so, set the value from the provided options, if not, and fill_defaults is
+    enabled, set to the default value. ]]
+    if options.single_line_comment_string ~= nil then
+        result[1] = options.single_line_comment_string
+    elseif not dont_fill_defaults then
+        result[1] = default[1]
+    end
+    if options.multi_line_comment_strings ~= nil then
+        result[2] = options.multi_line_comment_strings
+    elseif not dont_fill_defaults then
+        result[2] = default[2]
+    end
+    if options.force_single_line_comments ~= nil then
+        result[3] = options.force_single_line_comments
+    elseif not dont_fill_defaults then
+        result[3] = default[3]
+    end
+    if options.force_multi_line_comments ~= nil then
+        result[4] = options.force_multi_line_comments
+    elseif not dont_fill_defaults then
+        result[4] = default[4]
+    end
+    if options.use_consistent_indentation ~= nil then
+        result[5] = options.use_consistent_indentation
+    elseif not dont_fill_defaults then
+        result[5] = default[5]
+    end
+    M.config[language] = result
+end
 
 --[[--
 Check if configuration for filetype exists.
@@ -121,10 +180,10 @@ function M.config_from_commentstring(commentstring)
     --[[ Test if the commentstring is a single-line or multi-line comment,
     extract the appropriate fields into a table ]]
     if index_placeholder + #placeholder == #commentstring then
-        return {commentstring:sub(1, -#placeholder-1), false}
+        return {util.trim(commentstring:sub(1, -#placeholder-1)), false}
     end
-    return {false, {commentstring:sub(1, index_placeholder),
-        commentstring:sub(index_placeholder + #placeholder + 1, -1)}}
+    return {false, {util.trim(commentstring:sub(1, index_placeholder),
+        commentstring:sub(index_placeholder + #placeholder + 1, -1))}}
 end
 
 --[[--
