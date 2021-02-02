@@ -40,8 +40,8 @@ For those reasons, you might prefer to properly configure a language. You can do
 ```lua
 lua << EOF
 require('kommentary.config').configure_language("rust", {
-    single_line_comment = "//",
-    multi_line_comment = {"/*", "*/"},
+    single_line_comment_string = "//",
+    multi_line_comment_strings = {"/*", "*/"},
 })
 EOF
 ```
@@ -71,19 +71,6 @@ EOF
 ```
 
 If you set both of the to true, it will use the default.
-
-Please note that this is considered advise to the plugin, so there are cases in which multi-line comments will be used, for example if the multi-line comment string is set to false. You shouldn't worry about this, since you shouldn't encounter it during normal use.
-
-If you wish to completely disable any of these two, under all circumstances (Again, this shouldn't be necessary), you can simply set the multi-line comment string to false:
-
-```lua
-lua << EOF
-require('kommentary.config').configure_language("rust", {
-    single_line_comment = "//",
-    multi_line_comment = false,
-})
-EOF
-```
 
 ## Contributing
 
