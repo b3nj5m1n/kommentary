@@ -13,27 +13,29 @@ function Test_Config.test_has_filetype()
 end
 
 function Test_Config.test_config_from_commentstring()
-    lu.assertEquals(config.config_from_commentstring("--%s"), {"--", false})
-    lu.assertEquals(config.config_from_commentstring("<!--%s-->"), {false, {"<!--", "-->"}})
-    lu.assertEquals(config.config_from_commentstring("!%s"), {"!", false})
-    lu.assertEquals(config.config_from_commentstring(""), {"//", {"/*", "*/"}})
+    lu.assertEquals(config.config_from_commentstring("--%s"), {"--", false, false, false, true})
+    lu.assertEquals(config.config_from_commentstring("# %s"), {"#", false, false, false, true})
+    lu.assertEquals(config.config_from_commentstring("<!--%s-->"), {false, {"<!--", "-->"}, false, false, true})
+    lu.assertEquals(config.config_from_commentstring("!%s"), {"!", false, false, false, true})
+    lu.assertEquals(config.config_from_commentstring(""), {"//", {"/*", "*/"}, false, false, true})
+end
+
+function Test_Config.test_get_default_mode()
+    lu.assertEquals(config.get_default_mode("rust"), 1)
 end
 
 function Test_Config.test_get_config()
-    lu.assertEquals(config.get_config("python"), {"#", false})
-    lu.assertEquals(config.get_config("markdown"), {false, {"<!---", "-->"}})
-    lu.assertEquals(config.get_config("rust"), {"//", {"/*", "*/"}})
+    lu.assertEquals(config.get_config("fennel"), {";", false, false, false, true})
+    lu.assertEquals(config.get_config("rust"), {"//", {"/*", "*/"}, false, false, true})
 end
 
 function Test_Config.test_get_single()
-    lu.assertEquals(config.get_single("python"), "#")
-    lu.assertEquals(config.get_single("markdown"), false)
+    lu.assertEquals(config.get_single("fennel"), ";")
     lu.assertEquals(config.get_single("rust"), "//")
 end
 
 function Test_Config.test_get_multi()
-    lu.assertEquals(config.get_multi("python"), false)
-    lu.assertEquals(config.get_multi("markdown"), {"<!---", "-->"})
+    lu.assertEquals(config.get_multi("fennel"), false)
     lu.assertEquals(config.get_multi("rust"), {"/*", "*/"})
 end
 

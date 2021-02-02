@@ -95,12 +95,8 @@ end
 function M.toggle_comment(...)
     local args = {...}
     local line_number_start, line_number_end = args[1], args[2]
-    local calling_context = args[3]
-    local mode = modes.normal
-    if calling_context == context.line then
-        mode = modes.force_single
-    end
-    kommentary.toggle_comment_range(line_number_start, line_number_end, mode)
+    -- local calling_context = args[3]
+    kommentary.toggle_comment_range(line_number_start, line_number_end, modes.normal)
 end
 
 function M.toggle_comment_singles(...)

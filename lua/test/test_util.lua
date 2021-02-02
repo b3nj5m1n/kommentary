@@ -45,7 +45,7 @@ end
 function Test_Util.test_index_last_occurence()
     lu.assertEquals(util.index_last_occurence('test test test test', 'test'), 16)
     lu.assertEquals(util.index_last_occurence('/* This is what this */ function would be used for */', '*/'), 52)
-    lu.assertEquals(util.index_last_occurence('<!--- This is what this --> function would be used for -->', util.escape_pattern('-->')), 52)
+    lu.assertEquals(util.index_last_occurence('<!--- This is what this --> function would be used for -->', util.escape_pattern('-->')), 56)
     lu.assertEquals(util.index_last_occurence('', 'test'), 0)
     lu.assertEquals(util.index_last_occurence('test', ''), 5)
 end
