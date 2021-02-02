@@ -13,11 +13,11 @@ function Test_Config.test_has_filetype()
 end
 
 function Test_Config.test_config_from_commentstring()
-    lu.assertEquals(config.config_from_commentstring("--%s"), {"--", false, false, false, true})
-    lu.assertEquals(config.config_from_commentstring("# %s"), {"#", false, false, false, true})
-    lu.assertEquals(config.config_from_commentstring("<!--%s-->"), {false, {"<!--", "-->"}, false, false, true})
-    lu.assertEquals(config.config_from_commentstring("!%s"), {"!", false, false, false, true})
-    lu.assertEquals(config.config_from_commentstring(""), {"//", {"/*", "*/"}, false, false, true})
+    lu.assertEquals(config.config_from_commentstring("--%s"), {"--", false, false, false, true, true})
+    lu.assertEquals(config.config_from_commentstring("# %s"), {"#", false, false, false, true, true})
+    lu.assertEquals(config.config_from_commentstring("<!--%s-->"), {false, {"<!--", "-->"}, false, false, true, true})
+    lu.assertEquals(config.config_from_commentstring("!%s"), {"!", false, false, false, true, true})
+    lu.assertEquals(config.config_from_commentstring(""), {"//", {"/*", "*/"}, false, false, true, true})
 end
 
 function Test_Config.test_get_default_mode()
@@ -25,8 +25,8 @@ function Test_Config.test_get_default_mode()
 end
 
 function Test_Config.test_get_config()
-    lu.assertEquals(config.get_config("fennel"), {";", false, false, false, true})
-    lu.assertEquals(config.get_config("rust"), {"//", {"/*", "*/"}, false, false, true})
+    lu.assertEquals(config.get_config("fennel"), {";", false, false, false, true, true})
+    lu.assertEquals(config.get_config("rust"), {"//", {"/*", "*/"}, false, false, true, true})
 end
 
 function Test_Config.test_get_single()

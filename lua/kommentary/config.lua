@@ -8,8 +8,8 @@ local util = require("kommentary.util")
 --[[ The default values that will be used if commentstring isn't set,
 and that will be used to fill in any missing values in user configuration.  Read:
 single-line commentstring, multi-line commentstring, prefer multi-line comments,
-prefer single-line comments, use consistent indentation. ]]
-local default = {"//", {"/*", "*/"}, false, false, true}
+prefer single-line comments, use consistent indentation, ignore empty lines. ]]
+local default = {"//", {"/*", "*/"}, false, false, true, true}
 local M = {}
 --[[ These are the available modes that can be passed to
 `kommentary.go`, we need to choose the appropriate one for
@@ -38,19 +38,19 @@ or if it supports both single-line and multi-line comments. For example:
 ]]
 M.config = {
     ["c"] = default,
-    ["clojure"] = {";", {"(comment ", " )"}, false, false, true},
+    ["clojure"] = {";", {"(comment ", " )"}, false, false, true, true},
     ["cpp"] = default,
     ["cs"] = default,
-    ["fennel"] = {";", false, false, false, true},
+    ["fennel"] = {";", false, false, false, true, true},
     ["go"] = default,
-    ["haskell"] = {"--", {"{-", "-}"}, false, false, true},
+    ["haskell"] = {"--", {"{-", "-}"}, false, false, true, true},
     ["java"] = default,
     ["javascript"] = default,
     ["javascriptreact"] = default,
     ["kotlin"] = default,
-    ["lua"] = {"--", {"--[[", "]]"}, false, false, true},
+    ["lua"] = {"--", {"--[[", "]]"}, false, false, true, true},
     ["rust"] = default,
-    ["sql"] = {"--", {"/*", "*/"}, false, false, true},
+    ["sql"] = {"--", {"/*", "*/"}, false, false, true, true},
     ["swift"] = default,
     ["typescript"] = default,
     ["typescriptreact"] = default,
@@ -124,6 +124,26 @@ Interface for creating configuration entries.
                 --     print("Multi-single-line comment, consistent indentation.")
                 -- end
                 ```
+        ignore_whitespace (bool) if true, ignore empty lines when commenting out a
+            range with single-line commtents:
+                ```lua
+                -- function test_function_1()
+                --     print("test")
+                -- end
+                --
+                -- function test_function_2()
+                --     print("test")
+                -- end
+                ```
+                ```lua
+                -- function test_function_1()
+                --     print("test")
+                -- end
+
+                -- function test_function_2()
+                --     print("test")
+                -- end
+                ```
         dont_fill_defaults  by default, for options not provided in the options table,
             the option will be set according to the default value of that option,
             if this option is present, options not provided will be left at nil.
@@ -159,6 +179,11 @@ function M.configure_language(language, options)
     elseif not dont_fill_defaults then
         result[5] = default[5]
     end
+    if options.ignore_whitespace ~= nil then
+        result[6] = options.ignore_whitespace
+    elseif not dont_fill_defaults then
+        result[6] = default[6]
+    end
     M.config[language] = result
 end
 
@@ -187,11 +212,11 @@ function M.config_from_commentstring(commentstring)
     extract the appropriate fields into a table ]]
     if index_placeholder + #placeholder == #commentstring then
         return {util.trim(commentstring:sub(1, -#placeholder-1)),
-            false, false, false, true}
+            false, default[3], default[4], default[5], default[6]}
     end
     return {false, {util.trim(commentstring:sub(1, index_placeholder)),
         util.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1))},
-        false, false, true}
+        default[3], default[4], default[5], default[6]}
 end
 
 --[[--
