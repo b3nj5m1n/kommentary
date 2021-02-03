@@ -23,8 +23,3 @@ nmap gc     <Plug>kommentary_motion_default
 " regardless of the length of the range.
 " vmap gc     <Plug>kommentary_visual_singles
 
-lua << EOF
-require('kommentary.config').configure_language("default", {
-    prefer_single_line_comments = true,
-})
-EOF

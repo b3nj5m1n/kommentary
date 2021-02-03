@@ -16,6 +16,15 @@ function M.trim(s)
 end
 
 --[[--
+Returns true if the given string is only whitespace.
+@tparam string s String to check
+@treturn bool True if the string consists of only whitespace
+]]
+function M.is_empty(s)
+    return string.match(s, "%S") == nil
+end
+
+--[[--
 Insert prefix before the first non-whitespace character in string.
 @tparam string line String to which the prefix will be prepended
 @tparam string prefix Prefix put at the beginning of the string

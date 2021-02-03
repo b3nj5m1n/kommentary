@@ -55,7 +55,9 @@ function M.is_comment_multi_single(lines, configuration)
     end
     for _, line in ipairs(lines) do
         if not M.is_comment_single(line, configuration) then
-            return false
+            if not util.is_empty(line) then
+                return false
+            end
         end
     end
     -- All of the lines are single-line comments
@@ -145,29 +147,50 @@ function M.comment_in_range_single(line_number_start, line_number_end, configura
     line_number_start = line_number_start-1
     local comment_string = configuration[1]
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
-    --[[ If this is set to nil, for each line the comment will be inserted before
-    the first non-whitespace character, otherwise all comments will be
-    inserted at this index. ]]
+    --[[ This function will return the index at which to insert the comment prefix.
+    in the current state, this function will return the index of the first
+    non-whitespace character, if the option for consistend indentation is set,
+    it will later be overwritten to return a constant number (the lowest
+    index at which to insert indentation) ]]
+    local comment_index = function(line) return string.find(line, "%S") end
     local result = {}
     -- This is the flag for using consistend indentation
     if configuration[5] == true then
-        local comment_index = #content[1]
-        -- Search for the lowest level of indentation
+        --[[ This is the variable for keeping track of the lowest index we find,
+        initially we set it to -1, then loop over all lines until we find one
+        that is not empty, then set this variable to the length of that line.
+        This means that empty lines will not factor in to where the indentation
+        starts. ]]
+        local lowest_index = -1
+        for i = 1, #content, 1 do
+            lowest_index = #content[i]
+            if lowest_index > 0 then break end
+        end
+        --[[ Loop over all lines, get the index of the first non-whitespace char,
+        if that is lower then the current lowest_index, set it as the new
+        lowest_index. ]]
         for _, line in ipairs(content) do
             local index = string.find(line, "%S")
-            if index < comment_index then
-                comment_index = index
+            if index ~= nil and index < lowest_index then
+                lowest_index = index
             end
         end
-        for _, line in ipairs(content) do
-            table.insert(result, util.insert_at_index(line, comment_string .. " ", comment_index))
-        end
-    else
-        for _, line in ipairs(content) do
-            table.insert(result, util.insert_at_beginning(line, comment_string .. " "))
+        -- Set the comment_index function to return a constant value.
+        comment_index = function(line) return lowest_index end
+    end
+    -- Loop over all lines, insert the prefix at the previously set index.
+    for _, line in ipairs(content) do
+        --[[ Check if ignore_whitespace is set, if so, and the line is consists
+        of only whitespace, insert it back into result as-is. ]]
+        if configuration[6] == true and util.is_empty(line) == true then
+            table.insert(result, line)
+        else
+            table.insert(result, util.insert_at_index(line, comment_string .. " ",
+                comment_index(line)))
         end
     end
-    vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
+    vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false,
+        result)
 end
 
 --[[--
