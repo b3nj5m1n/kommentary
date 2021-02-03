@@ -14,12 +14,9 @@ vmap gc     <Plug>kommentary_visual_default
 " is longer than 1 line, otherwise it will use a single-line comment.
 nmap gc     <Plug>kommentary_motion_default
 
-" Custom mapping for motions; will toggle the range from commented to
-" not-commented and vice-versa, will enforce the use of single-line comments,
-" regardless of the length of the range.
-" nmap gc     <Plug>kommentary_motion_singles
-" Custom mapping for visual selections; will toggle the range from commented to
-" not-commented and vice-versa, will enforce the use of single-line comments,
-" regardless of the length of the range.
-" vmap gc     <Plug>kommentary_visual_singles
-
+nmap <leader>cic     <Plug>kommentary_line_increase
+nmap <leader>ci     <Plug>kommentary_motion_increase
+vmap <leader>ci     <Plug>kommentary_visual_increase
+nmap <leader>cdc     <Plug>kommentary_line_decrease
+nmap <leader>cd     <Plug>kommentary_motion_decrease
+vmap <leader>cd     <Plug>kommentary_visual_decrease

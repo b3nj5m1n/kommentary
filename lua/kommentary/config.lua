@@ -61,6 +61,21 @@ M.config = {
     ["typescriptreact"] = {"auto", "auto"},
 }
 
+function M.add_keymap(mode, name, context, options, callback)
+    local default_options = { noremap = true, silent = true, expr = false }
+    if options ~= nil then
+        for option, value in pairs(options) do
+            default_options[option] = value
+        end
+    end
+    name = '<Plug>' .. name
+    callback = (callback ~= nil and ', ' .. "'" ..  callback .. "'" or '')
+    local action = (context == M.context.init and '' or '<cmd>call ')
+        .. 'v:lua.kommentary.go(' .. context .. callback .. ')'
+        .. (default_options["expr"] == true and '' or '<cr>')
+    vim.api.nvim_set_keymap(mode, name, action, default_options)
+end
+
 --[[--
 Set up keymappings.
 Sets up <Plug>Kommentary, to this you should map the prefix you want to use for
@@ -85,27 +100,23 @@ function M.setup()
     mapping `<Plug>kommentary_visual_singles`, this is a mapping for visual mode
     which will always use single-line comment style, instead of the default,
     which would be multi-line comment-style if the range is longer than one line. ]]
-    -- Defaults
-    vim.api.nvim_set_keymap('n', '<Plug>kommentary_motion_default',
-        'v:lua.kommentary.go(' .. M.context.init .. ')',
-        { noremap = true, expr = true })
-    vim.api.nvim_set_keymap('n', '<Plug>kommentary_line_default',
-        '<cmd>call v:lua.kommentary.go(' .. M.context.line .. ')<cr>',
-        { noremap = true, silent = true })
-    vim.api.nvim_set_keymap('v', '<Plug>kommentary_visual_default',
-        '<cmd>call v:lua.kommentary.go(' .. M.context.visual .. ')<cr>',
-        { noremap = true, silent = true })
-    -- Non-default, Motion
-    vim.api.nvim_set_keymap('n', '<Plug>kommentary_motion_singles',
-        'v:lua.kommentary.go(' .. M.context.init .. ', ' ..
-        "'kommentary.toggle_comment_singles'" .. ')',
-        { noremap = true, expr = true })
-    -- Non-default, Line
-    -- Non-default, Visual
-    vim.api.nvim_set_keymap('v', '<Plug>kommentary_visual_singles',
-        '<cmd>lua require("kommentary");kommentary.go(' .. M.context.visual .. ', '
-        .. "'kommentary.toggle_comment_singles'" .. ')<cr>',
-        { noremap = true, silent = true })
+    M.add_keymap("n", "kommentary_motion_default", M.context.init, { expr = true })
+    M.add_keymap("n", "kommentary_line_default", M.context.line)
+    M.add_keymap("v", "kommentary_visual_default", M.context.visual)
+    -- Increase comment level
+    M.add_keymap("n", "kommentary_motion_increase", M.context.init, { expr = true },
+        "kommentary.increase_comment_level")
+    M.add_keymap("n", "kommentary_line_increase", M.context.line, {},
+        "kommentary.increase_comment_level")
+    M.add_keymap("v", "kommentary_visual_increase", M.context.visual, {},
+        "kommentary.increase_comment_level")
+    -- Decrease comment level
+    M.add_keymap("n", "kommentary_motion_decrease", M.context.init, { expr = true },
+        "kommentary.decrease_comment_level")
+    M.add_keymap("n", "kommentary_line_decrease", M.context.line, {},
+        "kommentary.decrease_comment_level")
+    M.add_keymap("v", "kommentary_visual_decrease", M.context.visual, {},
+        "kommentary.decrease_comment_level")
 end
 
 --[[--
