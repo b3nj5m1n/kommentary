@@ -42,6 +42,11 @@ function Test_Util.test_insert_at_beginning()
     lu.assertEquals(util.insert_at_beginning('    ', '// '), '//     ')
 end
 
+function Test_Util.test_insert_at_index()
+    lu.assertEquals(util.insert_at_index('test', '// ', 1), '// test')
+    lu.assertEquals(util.insert_at_index('test', '// ', 3), 'te// st')
+end
+
 function Test_Util.test_index_last_occurence()
     lu.assertEquals(util.index_last_occurence('test test test test', 'test'), 16)
     lu.assertEquals(util.index_last_occurence('/* This is what this */ function would be used for */', '*/'), 52)

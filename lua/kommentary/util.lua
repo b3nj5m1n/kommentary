@@ -34,6 +34,24 @@ function M.insert_at_beginning(line, prefix)
 end
 
 --[[--
+Insert prefix at index.
+@tparam string line String to which the prefix will be prepended
+@tparam string prefix Prefix that will be inserted at index
+@tparam int index Where to insert the prefix
+@treturn string String with prefix before first non-whitespace character
+]]
+function M.insert_at_index(line, prefix, index)
+    -- If the line is empty, just return the prefix with any whitespace stipped
+    if line == nil or line == '' then
+        return M.trim(prefix)
+    end
+    --[[ If there are no non-whitespace characters on the line,
+    use 1 as a starting index ]]
+    index = index == nil and 1 or index
+    return string.sub(line, 0, index-1) .. prefix .. string.sub(line, index, #line)
+end
+
+--[[--
 Get the index of the last occurence of a pattern in a string.
 @tparam string str String to search for the pattern
 @tparam string pattern Pattern to search for

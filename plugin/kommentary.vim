@@ -22,3 +22,9 @@ nmap gc     <Plug>kommentary_motion_default
 " not-commented and vice-versa, will enforce the use of single-line comments,
 " regardless of the length of the range.
 " vmap gc     <Plug>kommentary_visual_singles
+
+lua << EOF
+require('kommentary.config').configure_language("default", {
+    prefer_single_line_comments = true,
+})
+EOF

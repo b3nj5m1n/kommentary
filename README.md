@@ -70,6 +70,8 @@ require('kommentary.config').configure_language("rust", {
 EOF
 ```
 
+If you set both of the to true, it will use the default.
+
 You can also set global defaults, these will be used for all languages, unless you overwrite it for that specific language like shown above:
 ```lua
 lua << EOF
@@ -79,7 +81,6 @@ require('kommentary.config').configure_language("default", {
 EOF
 ```
 
-If you set both of the to true, it will use the default.
 
 ## Contributing
 
