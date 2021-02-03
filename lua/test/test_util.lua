@@ -52,6 +52,7 @@ end
 function Test_Util.test_insert_at_index()
     lu.assertEquals(util.insert_at_index('test', '// ', 1), '// test')
     lu.assertEquals(util.insert_at_index('test', '// ', 3), 'te// st')
+    lu.assertEquals(util.insert_at_index('', '// ', 1), 't// ')
 end
 
 function Test_Util.test_index_last_occurence()
