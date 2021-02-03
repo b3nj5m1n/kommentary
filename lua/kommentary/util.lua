@@ -54,9 +54,9 @@ function M.insert_at_index(line, prefix, index)
     if M.is_empty(line) then
         return M.trim(prefix)
     end
-    --[[ If there are no non-whitespace characters on the line,
-    use 1 as a starting index ]]
+    --[[ If the index is lower than 1 or nil, set it to 1 ]]
     index = index == nil and 1 or index
+    index = index < 0 and 1 or index
     return string.sub(line, 0, index-1) .. prefix .. string.sub(line, index, #line)
 end
 
