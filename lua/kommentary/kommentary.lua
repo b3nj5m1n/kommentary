@@ -25,8 +25,7 @@ end
 --[[--
 Check if a string is a multi-line comment.
 @tparam {string,...} lines A table of lines
-@tparam {string,string} comment_strings A tuple containing the prefix and
-        suffix of a multi-line comment
+@tparam table configuration The entire config table currently in use
 @treturn bool true if it is a multi-line comment, otherwise false
 ]]
 function M.is_comment_multi(lines, configuration)
@@ -200,8 +199,7 @@ If the language doesn't support multi-line comments, it will turn the range
 into multiple single-line comments instead.
 @tparam int line_number_start Start of the range, inclusive
 @tparam int line_number_end End of the range, inclusive
-@tparam {string,string} comment_string A tuple containing the prefix and
-        suffix of a multi-line comment
+@tparam table configuration The entire config table currently in use
 @treturn nil
 ]]
 function M.comment_in_range(line_number_start, line_number_end, configuration)
@@ -261,8 +259,7 @@ Just as with commenting out a single line, this might not make the range into
 normal code, but remove one *level* of commenting instead.
 @tparam int line_number_start Start of the range, inclusive
 @tparam int line_number_end End of the range, inclusive
-@tparam {string,string} comment_string A tuple containing the prefix and
-        suffix of a multi-line comment
+@tparam table configuration The entire config table currently in use
 @treturn nil
 @see comment_out_line
 ]]
