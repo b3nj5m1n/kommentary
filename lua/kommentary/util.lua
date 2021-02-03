@@ -47,7 +47,7 @@ Insert prefix at index.
 @tparam string line String to which the prefix will be prepended
 @tparam string prefix Prefix that will be inserted at index
 @tparam int index Where to insert the prefix
-@treturn string String with prefix before first non-whitespace character
+@treturn string String with prefix at index
 ]]
 function M.insert_at_index(line, prefix, index)
     -- If the line is empty, just return the prefix with any whitespace stipped
