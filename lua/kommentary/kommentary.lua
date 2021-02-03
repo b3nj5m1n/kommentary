@@ -12,7 +12,7 @@ local M = {}
 --[[--
 Check if a string is a single-line comment.
 @tparam string line A single line string
-@tparam string comment_string The prefix of a single-line comment
+@tparam table configuration The entire config table currently in use
 @treturn bool true if it is a single-line comment, otherwise false
 ]]
 function M.is_comment_single(line, configuration)
@@ -45,7 +45,7 @@ end
 --[[--
 Check if a string is a range of single-line comments.
 @tparam {string,...} lines A table of lines
-@tparam string comment_string The prefix of a single-line comment
+@tparam table configuration The entire config table currently in use
 @treturn bool true if it is a range of single-line comments
 ]]
 function M.is_comment_multi_single(lines, configuration)
@@ -68,6 +68,7 @@ end
 Checks if the specified range in the buffer is a comment.
 @tparam int line_number_start Start of the range, inclusive
 @tparam int line_number_end End of the range, inclusive
+@tparam table configuration The entire config table currently in use
 @treturn bool true if it is a multi-line comment, otherwise false
 ]]
 function M.is_comment(line_number_start, line_number_end, configuration)
@@ -108,7 +109,7 @@ end
 --[[--
 Turns the line into a single-line comment.
 @tparam int line_number Line to operate on
-@tparam string comment_string The prefix of a single-line comment
+@tparam table configuration The entire config table currently in use
 @treturn nil
 ]]
 function M.comment_in_line(line_number, configuration)
@@ -124,7 +125,7 @@ multiple times, for example in lua: `-- -- This has been commented out 2 times`,
 in which case it will remove one *level* of comments, so in this example it will
 turn into:  `-- This has been commented out 2 times`.
 @tparam int line_number Line to operate on
-@tparam string comment_string The prefix of a single-line comment
+@tparam table configuration The entire config table currently in use
 @treturn nil
 ]]
 function M.comment_out_line(line_number, configuration)
@@ -140,7 +141,7 @@ end
 Turns the range into multiple single-line comments.
 @tparam int line_number_start Start of the range, inclusive
 @tparam int line_number_end End of the range, inclusive
-@tparam string comment_string The prefix of a single-line comment
+@tparam table configuration The entire config table currently in use
 @treturn nil
 ]]
 function M.comment_in_range_single(line_number_start, line_number_end, configuration)
@@ -149,12 +150,12 @@ function M.comment_in_range_single(line_number_start, line_number_end, configura
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     --[[ This function will return the index at which to insert the comment prefix.
     in the current state, this function will return the index of the first
-    non-whitespace character, if the option for consistend indentation is set,
+    non-whitespace character, if the option for consistent indentation is set,
     it will later be overwritten to return a constant number (the lowest
     index at which to insert indentation) ]]
     local comment_index = function(line) return string.find(line, "%S") end
     local result = {}
-    -- This is the flag for using consistend indentation
+    -- This is the flag for using consistent indentation
     if configuration[5] == true then
         --[[ This is the variable for keeping track of the lowest index we find,
         initially we set it to -1, then loop over all lines until we find one
@@ -237,7 +238,7 @@ end
 Turns the range, multiple single-line comments, into normal code.
 @tparam int line_number_start Start of the range, inclusive
 @tparam int line_number_end End of the range, inclusive
-@tparam string comment_string The prefix of a single-line comment
+@tparam table configuration The entire config table currently in use
 @treturn nil
 ]]
 function M.comment_out_range_single(line_number_start, line_number_end, configuration)
