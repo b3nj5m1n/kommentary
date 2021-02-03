@@ -208,7 +208,7 @@ end
 
 --[[--
 Generate a config table from a commentstring.
-@tparam string commenting The commentstring to convert, see :h commentstring
+@tparam string commentstring The commentstring to convert, see :h commentstring
 @treturn {?bool|string,?bool{string,string}} Config table for commentstring
 ]]
 function M.config_from_commentstring(commentstring)
