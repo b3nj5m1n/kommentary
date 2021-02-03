@@ -51,7 +51,7 @@ Insert prefix at index.
 ]]
 function M.insert_at_index(line, prefix, index)
     -- If the line is empty, just return the prefix with any whitespace stipped
-    if line == nil or line == '' then
+    if M.is_empty(line) then
         return M.trim(prefix)
     end
     --[[ If there are no non-whitespace characters on the line,
