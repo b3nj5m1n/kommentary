@@ -9,8 +9,10 @@ local util = require("kommentary.util")
 and that will be used to fill in any missing values in user configuration.  Read:
 single-line commentstring, multi-line commentstring, prefer multi-line comments,
 prefer single-line comments, use consistent indentation, ignore empty lines. ]]
-local default = {"//", {"/*", "*/"}, false, false, true, true}
 local M = {}
+local default = {"//", {"/*", "*/"}, false, false, true, true}
+function M.get_default_config() return default end
+function M.set_default_config(new_default) default = new_default end
 --[[ These are the available modes that can be passed to
 `kommentary.go`, we need to choose the appropriate one for
 each mapping depending on the mode of the mapping ]]
@@ -29,6 +31,8 @@ The value is the configuration for that filetype, a table containing:
         meaning single-line comments will be used when available.
     * A bool, if set to true consistent indentation will be used in
         multi-single comments.
+    Any missing values, or when they're set to "default", will be filled in with
+        the default values.
 A language will get an explicit configuration here if the commentstring is not defined,
 or if it supports both single-line and multi-line comments. For example:
     * bash doesn't get in, it only supports single-line comments and the
@@ -38,23 +42,23 @@ or if it supports both single-line and multi-line comments. For example:
     * fennel does get in because the commentstring isn't set for it.
 ]]
 M.config = {
-    ["c"] = default,
-    ["clojure"] = {";", {"(comment ", " )"}, false, false, true, true},
-    ["cpp"] = default,
-    ["cs"] = default,
-    ["fennel"] = {";", false, false, false, true, true},
-    ["go"] = default,
-    ["haskell"] = {"--", {"{-", "-}"}, false, false, true, true},
-    ["java"] = default,
-    ["javascript"] = default,
-    ["javascriptreact"] = {"auto", "auto", false, false, true, true},
-    ["kotlin"] = default,
-    ["lua"] = {"--", {"--[[", "]]"}, false, false, true, true},
-    ["rust"] = default,
-    ["sql"] = {"--", {"/*", "*/"}, false, false, true, true},
-    ["swift"] = default,
-    ["typescript"] = default,
-    ["typescriptreact"] = {"auto", "auto", false, false, true, true},
+    ["c"] = {},
+    ["clojure"] = {";", {"(comment ", " )"}},
+    ["cpp"] = {},
+    ["cs"] = {},
+    ["fennel"] = {";", false},
+    ["go"] = {},
+    ["haskell"] = {"--", {"{-", "-}"}},
+    ["java"] = {},
+    ["javascript"] = {},
+    ["javascriptreact"] = {"auto", "auto"},
+    ["kotlin"] = {},
+    ["lua"] = {"--", {"--[[", "]]"}},
+    ["rust"] = {},
+    ["sql"] = {"--", {"/*", "*/"}},
+    ["swift"] = {},
+    ["typescript"] = {},
+    ["typescriptreact"] = {"auto", "auto"},
 }
 
 --[[--
@@ -159,32 +163,36 @@ function M.configure_language(language, options)
     if options.single_line_comment_string ~= nil then
         result[1] = options.single_line_comment_string
     elseif not dont_fill_defaults then
-        result[1] = default[1]
+        result[1] = M.get_default_config()[1]
     end
     if options.multi_line_comment_strings ~= nil then
         result[2] = options.multi_line_comment_strings
     elseif not dont_fill_defaults then
-        result[2] = default[2]
+        result[2] = M.get_default_config()[2]
     end
     if options.prefer_single_line_comments ~= nil then
         result[3] = options.prefer_single_line_comments
     elseif not dont_fill_defaults then
-        result[3] = default[3]
+        result[3] = M.get_default_config()[3]
     end
     if options.prefer_multi_line_comments ~= nil then
         result[4] = options.prefer_multi_line_comments
     elseif not dont_fill_defaults then
-        result[4] = default[4]
+        result[4] = M.get_default_config()[4]
     end
     if options.use_consistent_indentation ~= nil then
         result[5] = options.use_consistent_indentation
     elseif not dont_fill_defaults then
-        result[5] = default[5]
+        result[5] = M.get_default_config()[5]
     end
     if options.ignore_whitespace ~= nil then
         result[6] = options.ignore_whitespace
     elseif not dont_fill_defaults then
-        result[6] = default[6]
+        result[6] = M.get_default_config()[6]
+    end
+    if language == "default" then
+        M.set_default_config(result)
+        return
     end
     M.config[language] = result
 end
@@ -207,18 +215,16 @@ function M.config_from_commentstring(commentstring)
     local placeholder = '%s'
     local index_placeholder = commentstring:find(util.escape_pattern(placeholder))
     if not index_placeholder then
-        return default
+        return M.default
     end
     index_placeholder = index_placeholder - 1
     --[[ Test if the commentstring is a single-line or multi-line comment,
     extract the appropriate fields into a table ]]
     if index_placeholder + #placeholder == #commentstring then
-        return {util.trim(commentstring:sub(1, -#placeholder-1)),
-            false, default[3], default[4], default[5], default[6]}
+        return {util.trim(commentstring:sub(1, -#placeholder-1)), false}
     end
     return {false, {util.trim(commentstring:sub(1, index_placeholder)),
-        util.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1))},
-        default[3], default[4], default[5], default[6]}
+        util.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1))}}
 end
 
 --[[--
@@ -238,9 +244,15 @@ function M.get_config(filetype)
         --[[ We can't get the commentstring for a filetype different from the
         current buffer, so in that case always return the default ]]
         return filetype == vim.bo.filetype
-            and M.config_from_commentstring(vim.bo.commentstring) or default
+            and M.config_from_commentstring(vim.bo.commentstring) or M.default
     end
     local result = {unpack(M.config[filetype])}
+    -- Fill in missing or "default" fields
+    for i = 1,6,1 do
+        if result[i] == "default" or result[i] == nil then
+            result[i] = M.get_default_config()[i]
+        end
+    end
     if result[1] == "auto" then
         result[1] = M.config_from_commentstring(vim.bo.commentstring)[1]
     end
