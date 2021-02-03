@@ -16,6 +16,15 @@ function M.trim(s)
 end
 
 --[[--
+Returns true if the given string is only whitespace.
+@tparam string s String to check
+@treturn bool True if the string consists of only whitespace
+]]
+function M.is_empty(s)
+    return string.match(s, "%S") == nil
+end
+
+--[[--
 Insert prefix before the first non-whitespace character in string.
 @tparam string line String to which the prefix will be prepended
 @tparam string prefix Prefix put at the beginning of the string
@@ -31,6 +40,24 @@ function M.insert_at_beginning(line, prefix)
     use 1 as a starting index ]]
     start_index = start_index == nil and 1 or start_index
     return string.sub(line, 0, start_index-1) .. prefix .. string.sub(line, start_index, #line)
+end
+
+--[[--
+Insert prefix at index.
+@tparam string line String to which the prefix will be prepended
+@tparam string prefix Prefix that will be inserted at index
+@tparam int index Where to insert the prefix
+@treturn string String with prefix at index
+]]
+function M.insert_at_index(line, prefix, index)
+    -- If the line is empty, just return the prefix with any whitespace stipped
+    if M.is_empty(line) then
+        return M.trim(prefix)
+    end
+    --[[ If the index is lower than 1 or nil, set it to 1 ]]
+    index = index == nil and 1 or index
+    index = index < 0 and 1 or index
+    return string.sub(line, 0, index-1) .. prefix .. string.sub(line, index, #line)
 end
 
 --[[--

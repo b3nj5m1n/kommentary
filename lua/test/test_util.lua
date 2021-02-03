@@ -29,6 +29,13 @@ function Test_Util.test_trim_spaces_and_tabs()
     lu.assertEquals(util.trim(''), '')
 end
 
+function Test_Util.test_is_empty()
+    lu.assertEquals(util.is_empty('  test'), false)
+    lu.assertEquals(util.is_empty('  '), true)
+    lu.assertEquals(util.is_empty('	'), true)
+    lu.assertEquals(util.is_empty('	  '), true)
+end
+
 function Test_Util.test_insert_at_beginning()
     lu.assertEquals(util.insert_at_beginning('test', '// '), '// test')
     lu.assertEquals(util.insert_at_beginning('test', '//'), '//test')
@@ -40,6 +47,12 @@ function Test_Util.test_insert_at_beginning()
     lu.assertEquals(util.insert_at_beginning('test', '! '), '! test')
     lu.assertEquals(util.insert_at_beginning('test', '	§s!!!+#12235    '), '	§s!!!+#12235    test')
     lu.assertEquals(util.insert_at_beginning('    ', '// '), '//     ')
+end
+
+function Test_Util.test_insert_at_index()
+    lu.assertEquals(util.insert_at_index('test', '// ', 1), '// test')
+    lu.assertEquals(util.insert_at_index('test', '// ', 3), 'te// st')
+    lu.assertEquals(util.insert_at_index('', '// ', 1), 't// ')
 end
 
 function Test_Util.test_index_last_occurence()
