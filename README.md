@@ -26,10 +26,26 @@ Plug 'b3nj5m1n/kommentary'
 
 The default keybindings are the same as in vim-commentary. That means you an toggle comments for the current line using gcc, for the current visual selection using gc, and in combination with a motion using gc, for example gc5j.
 
-There's also some more advanced mappings:
+There's also some more advanced mappings which you can activate if you put this in your init.lua:
+
+```lua
+require('kommentary.config').use_extended_mappings()
+```
+
+The new mappings are:
 
 * leader cic will increase commenting level for the current line, <leader>ci will do the same for a visual selection or motion
 * leader cdc will decrease commenting level for the current line, <leader>di will do the same for a visual selection or motion
+
+Which behind the scenes calls the following chunk of code, which you could also execute yourself with keybindings of your choice:
+```lua
+vim.api.nvim_set_keymap("n", "<leader>cic", "<Plug>kommentary_line_increase", {})
+vim.api.nvim_set_keymap("n", "<leader>ci", "<Plug>kommentary_motion_increase", {})
+vim.api.nvim_set_keymap("v", "<leader>ci", "<Plug>kommentary_visual_increase", {})
+vim.api.nvim_set_keymap("n", "<leader>cdc", "<Plug>kommentary_line_decrease", {})
+vim.api.nvim_set_keymap("n", "<leader>cd", "<Plug>kommentary_motion_decrease", {})
+vim.api.nvim_set_keymap("v", "<leader>cd", "<Plug>kommentary_visual_decrease", {})
+```
 
 ## Configuration
 

@@ -78,18 +78,6 @@ end
 
 --[[--
 Set up keymappings.
-Sets up <Plug>Kommentary, to this you should map the prefix you want to use for
-    motions, so for example if you want to be able to to gc5j to toggle comments
-    for the next 5 lines, do this: `nmap gc <Plug>Kommentary`.
-Sets up <Plug>KommentaryVisual, which is obviously for the visual mode mapping,
-    for example to be able to do gc in visual mode, do this mapping:
-    `vmap gc <Plug>KommentaryVisual`, this will leave you in visual mode after
-    toggeling comments, if you always want to go back to normal mode afterwards:
-    `vmap gc <Plug>KommentaryVisual<C-c>`
-Sets up <Plug>KommentaryLine, which is what you should use for commenting out single
-    lines, so if you want to be able to do gcc in normal mode to comment out the
-    line you're currently on, do this: `nmap gcc <Plug>KommentaryLine`
-@treturn nil
 ]]
 function M.setup()
     -- This is the global variable holding the callback function to be called by go()
@@ -117,6 +105,35 @@ function M.setup()
         "kommentary.decrease_comment_level")
     M.add_keymap("v", "kommentary_visual_decrease", M.context.visual, {},
         "kommentary.decrease_comment_level")
+end
+
+--[[--
+Creates mappings familiar from vim-commentary.
+]]
+function M.use_default_mappings()
+    --[[ The default mapping for line-wise operation; will toggle the range from
+    commented to not-commented and vice-versa, will use a single-line comment. ]]
+    vim.api.nvim_set_keymap("n", "gcc", "<Plug>kommentary_line_default", {})
+    --[[ The default mapping for visual selections; will toggle the range from
+    commented to not-commented and vice-versa, will use multi-line comments when
+    the range is longer than 1 line, otherwise it will use a single-line comment. ]]
+    vim.api.nvim_set_keymap("v", "gc", "<Plug>kommentary_visual_default", {})
+    --[[ The default mapping for motions; will toggle the range from commented to
+    not-commented and vice-versa, will use multi-line comments when the range
+    is longer than 1 line, otherwise it will use a single-line comment. ]]
+    vim.api.nvim_set_keymap("n", "gc", "<Plug>kommentary_motion_default", {})
+end
+
+--[[--
+Creates mappings for in/decreasing comment level.
+]]
+function M.use_extended_mappings()
+    vim.api.nvim_set_keymap("n", "<leader>cic", "<Plug>kommentary_line_increase", {})
+    vim.api.nvim_set_keymap("n", "<leader>ci", "<Plug>kommentary_motion_increase", {})
+    vim.api.nvim_set_keymap("v", "<leader>ci", "<Plug>kommentary_visual_increase", {})
+    vim.api.nvim_set_keymap("n", "<leader>cdc", "<Plug>kommentary_line_decrease", {})
+    vim.api.nvim_set_keymap("n", "<leader>cd", "<Plug>kommentary_motion_decrease", {})
+    vim.api.nvim_set_keymap("v", "<leader>cd", "<Plug>kommentary_visual_decrease", {})
 end
 
 --[[--
