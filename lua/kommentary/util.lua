@@ -7,15 +7,6 @@ This module contains generic convenience functions.
 local M = {}
 
 --[[--
-Trim leading and trailing whitespace from string.
-@tparam string s String to trim
-@treturn string String without leading or trailing whitespace
-]]
-function M.trim(s)
-    return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
---[[--
 Returns true if the given string is only whitespace.
 @tparam string s String to check
 @treturn bool True if the string consists of only whitespace
@@ -91,15 +82,6 @@ function M.gsub_from_index(str, pattern, replacement, count, start_index)
     local result = (start_index-1 > 0 and string.sub(str, 1, start_index-1) or '')
         .. string.gsub(string.sub(str, start_index, #str), pattern, replacement, count)
     return result
-end
-
---[[--
-Escape special characters in string
-@tparam string text String to escape
-@treturn string String with all special chars escaped
-]]
-function M.escape_pattern(text)
-    return text:gsub("([^%w])", "%%%1")
 end
 
 --[[--

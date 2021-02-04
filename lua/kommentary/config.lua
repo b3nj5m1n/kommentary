@@ -241,7 +241,7 @@ Generate a config table from a commentstring.
 ]]
 function M.config_from_commentstring(commentstring)
     local placeholder = '%s'
-    local index_placeholder = commentstring:find(util.escape_pattern(placeholder))
+    local index_placeholder = commentstring:find(vim.pesc(placeholder))
     if not index_placeholder then
         return M.default
     end
@@ -249,10 +249,10 @@ function M.config_from_commentstring(commentstring)
     --[[ Test if the commentstring is a single-line or multi-line comment,
     extract the appropriate fields into a table ]]
     if index_placeholder + #placeholder == #commentstring then
-        return {util.trim(commentstring:sub(1, -#placeholder-1)), false}
+        return {vim.trim(commentstring:sub(1, -#placeholder-1)), false}
     end
-    return {false, {util.trim(commentstring:sub(1, index_placeholder)),
-        util.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1))}}
+    return {false, {vim.trim(commentstring:sub(1, index_placeholder)),
+        vim.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1))}}
 end
 
 --[[--

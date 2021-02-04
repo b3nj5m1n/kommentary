@@ -18,7 +18,7 @@ Check if a string is a single-line comment.
 function M.is_comment_single(line, configuration)
     -- Since the line might be indented, trim all whitespace
     local comment_string = configuration[1]
-    line = util.trim(line)
+    line = vim.trim(line)
     return line:sub(1, #comment_string) == comment_string
 end
 
@@ -34,8 +34,8 @@ function M.is_comment_multi(lines, configuration)
         return false
     end
     -- Only the first and last lines are relevant, these may be the same
-    local first_line = util.trim(lines[1])
-    local last_line = util.trim(lines[#lines])
+    local first_line = vim.trim(lines[1])
+    local last_line = vim.trim(lines[#lines])
     local begins = first_line:sub(1, #comment_strings[1]) == comment_strings[1]
     local ends = last_line:sub(-#comment_strings[2]) == comment_strings[2]
     return begins and ends
@@ -131,7 +131,7 @@ function M.comment_out_line(line_number, configuration)
     local comment_string = configuration[1]
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
     if M.is_comment_single(content, configuration) then
-        local result, _ = string.gsub(content, util.escape_pattern(comment_string) .. "%s*", "", 1)
+        local result, _ = string.gsub(content, vim.pesc(comment_string) .. "%s*", "", 1)
         vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {result})
     end
 end
@@ -245,7 +245,7 @@ function M.comment_out_range_single(line_number_start, line_number_end, configur
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     local result = {}
     for _, line in ipairs(content) do
-        local new_line, _ = string.gsub(line, util.escape_pattern(comment_string) .. "%s?", "", 1)
+        local new_line, _ = string.gsub(line, vim.pesc(comment_string) .. "%s?", "", 1)
         table.insert(result, new_line)
     end
     vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
@@ -275,12 +275,12 @@ function M.comment_out_range(line_number_start, line_number_end, configuration)
             for i, line in ipairs(content) do
                 local new_line = line
                 if i == 1 then
-                    new_line, _ = string.gsub(new_line, util.escape_pattern(comment_strings[1]) .. "%s*", "", 1)
+                    new_line, _ = string.gsub(new_line, vim.pesc(comment_strings[1]) .. "%s*", "", 1)
                 end
                 if i == #content then
                     -- This will make sure that only the last occurence of the suffix is replaced
-                    local start_index = util.index_last_occurence(new_line, util.escape_pattern(comment_strings[2]))
-                    new_line, _ = util.gsub_from_index(new_line, "%s*" .. util.escape_pattern(comment_strings[2]), "", 1, start_index-1)
+                    local start_index = util.index_last_occurence(new_line, vim.pesc(comment_strings[2]))
+                    new_line, _ = util.gsub_from_index(new_line, "%s*" .. vim.pesc(comment_strings[2]), "", 1, start_index-1)
                 end
                 result[i] = new_line
             end
