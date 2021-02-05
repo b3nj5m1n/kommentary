@@ -106,6 +106,13 @@ function M.setup()
         "kommentary.decrease_comment_level")
     M.add_keymap("v", "kommentary_visual_decrease", M.context.visual, {},
         "kommentary.decrease_comment_level")
+
+  -- If the user has set the g:kommentary_create_default_mappings variable use that value
+  --  otherwise default to creating the mappings
+  local create_default_mappings = vim.g.kommentary_create_default_mappings
+  if create_default_mappings == nil or create_default_mappings == 1 then
+    M.use_default_mappings()
+  end
 end
 
 --[[--
