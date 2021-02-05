@@ -57,7 +57,7 @@ M.config = {
     ["rust"] = {},
     ["sql"] = {"--", {"/*", "*/"}},
     ["swift"] = {},
-    ["toml"] = {"#"},
+    ["toml"] = {"#", false},
     ["typescript"] = {},
     ["typescriptreact"] = {"auto", "auto"},
 }
