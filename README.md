@@ -1,6 +1,6 @@
 # kommentary
 
-Neovim plugin to comment text in and out, written in lua. Supports commenting out the current line, a visual selection and a motion/textobject.
+Neovim plugin to comment text in and out, written in lua. Supports commenting out the current line, a visual selection and a motion.
 
 ![](https://s2.gifyu.com/images/Peek-2021-01-30-23-12.gif)
 
@@ -93,7 +93,7 @@ require('kommentary.config').configure_language("rust", {
 EOF
 ```
 
-If you set both of the to true, it will use the default.
+If you set both of them to true, it will use the default.
 
 You can also set global defaults, these will be used for all languages, unless you overwrite it for that specific language like shown above:
 ```lua
@@ -204,13 +204,13 @@ If you found a bug or want to request a feature, pleases do so by [raising an is
 ### Pull Requests
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+2. Create your Feature Branch (`git checkout -b amazing_feature`)
 3. Make your changes
-4. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-5. Push to the Branch (`git push origin feature/AmazingFeature`)
+4. Commit your Changes (`git commit -m 'Add some amazing feature'`)
+5. Push to the Branch (`git push origin amazing_feature`)
 6. Open a Pull Request
 
-Please try your best to follow the style of the rest of the codebase, even though there's no official spec or linter for it.
+Please try your best to follow the style of the rest of the codebase, even though there's no official spec or linter for it. (Try not to exceed 80 lines, use snake_case)
 
 ### Documentation
 
@@ -241,3 +241,5 @@ Or to run all tests:
 cd ./lua/
 ./run_tests.sh
 ```
+
+Atm, these unit tests don't cover a lot of the plugin because with luaunit we don't have access to the neovim api, meaning these aren't really that useful. They're also often outdated.
