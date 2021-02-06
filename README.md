@@ -47,6 +47,18 @@ vim.api.nvim_set_keymap("n", "<leader>cd", "<Plug>kommentary_motion_decrease", {
 vim.api.nvim_set_keymap("v", "<leader>cd", "<Plug>kommentary_visual_decrease", {})
 ```
 
+If you don't want to use the default mappings, you can disable the creation of those using the `kommentary_create_default_mappings` variable. Be sure to set the value *before* the plugin is loaded though.
+```lua
+vim.g.kommentary_create_default_mappings = false
+```
+
+You can then map those actions yourself (You might need to do that *after* the plugin is loaded), for example:
+```lua
+vim.api.nvim_set_keymap("n", "<leader>cc", "<Plug>kommentary_line_default", {})
+vim.api.nvim_set_keymap("n", "<leader>c", "<Plug>kommentary_motion_default", {})
+vim.api.nvim_set_keymap("v", "<leader>c", "<Plug>kommentary_visual_default", {})
+```
+
 ## Configuration
 
 For most users, configuration should hardly be necessary, I try to provide sane defaults and the plugin, once installed, can basically be used as a drop-in replacement for vim-commentary. That being said, maybe you have some different preferences, or you like your editor heavily customised, this plugin should still have you covered.
