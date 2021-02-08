@@ -251,7 +251,7 @@ function M.config_from_commentstring(commentstring)
     local placeholder = '%s'
     local index_placeholder = commentstring:find(vim.pesc(placeholder))
     if not index_placeholder then
-        return M.default
+        return M.get_default_config()
     end
     index_placeholder = index_placeholder - 1
     --[[ Test if the commentstring is a single-line or multi-line comment,
@@ -281,7 +281,7 @@ function M.get_config(filetype)
         --[[ We can't get the commentstring for a filetype different from the
         current buffer, so in that case always return the default ]]
         result = filetype == vim.bo.filetype
-            and M.config_from_commentstring(vim.bo.commentstring) or M.default
+            and M.config_from_commentstring(vim.bo.commentstring) or M.get_default_config()
     else
         result = {unpack(M.config[filetype])}
     end
