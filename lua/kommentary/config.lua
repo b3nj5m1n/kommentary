@@ -286,6 +286,7 @@ function M.get_config(filetype)
         result = {unpack(M.config[filetype])}
     end
     -- Fill in missing or "default" fields
+    if result == nil then return end
     for i = 1,6,1 do
         if result[i] == "default" or result[i] == nil then
             result[i] = M.get_default_config()[i]
@@ -310,6 +311,7 @@ function M.get_default_mode(filetype)
     local modes = M.get_modes()
     --[[ If both prefer_multi and prefer_single are set, or if none of them are
     set, use the default mode. ]]
+    if config == nil then return end
     if (config[3] and config[4]) or (not config[3] and not config[4]) then
         return modes.normal
     end
@@ -338,6 +340,7 @@ If the language doesn't support single line comments,
 function M.get_mode(line_number_start, line_number_end, mode)
     local modes = M.get_modes()
     local config = M.get_config(0)
+    if config == nil or modes == nil then return end
     --[[ The function was called with something non-default,
     this overwrites everything else. ]]
     if mode ~= modes.normal then

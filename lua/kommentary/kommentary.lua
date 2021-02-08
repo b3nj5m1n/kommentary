@@ -77,6 +77,7 @@ function M.is_comment(line_number_start, line_number_end, configuration)
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
     -- Check whether the range is a single- or multiline range, get the appropriate comment_string
     local comment_string = nil
+    if configuration == nil then return end
     if #content == 1 then
         comment_string = configuration[1]
         if not comment_string == false then
@@ -204,6 +205,7 @@ into multiple single-line comments instead.
 ]]
 function M.comment_in_range(line_number_start, line_number_end, configuration)
     line_number_start = line_number_start-1
+    if configuration == nil then return end
     local comment_strings = configuration[2]
     local content = vim.api.nvim_buf_get_lines(0, line_number_start,
         line_number_end, false)
