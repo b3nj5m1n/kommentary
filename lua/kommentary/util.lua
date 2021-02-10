@@ -24,7 +24,7 @@ Insert prefix before the first non-whitespace character in string.
 function M.insert_at_beginning(line, prefix)
     -- If the line is empty, just return the prefix with any whitespace stipped
     if line == nil or line == '' then
-        return M.trim(prefix)
+        return vim.trim(prefix)
     end
     local start_index = string.find(line, "%S")
     --[[ If there are no non-whitespace characters on the line,
@@ -43,7 +43,7 @@ Insert prefix at index.
 function M.insert_at_index(line, prefix, index)
     -- If the line is empty, just return the prefix with any whitespace stipped
     if M.is_empty(line) then
-        return M.trim(prefix)
+        return vim.trim(prefix)
     end
     --[[ If the index is lower than 1 or nil, set it to 1 ]]
     index = index == nil and 1 or index
