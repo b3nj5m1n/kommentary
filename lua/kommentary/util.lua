@@ -41,9 +41,10 @@ Insert prefix at index.
 @treturn string String with prefix at index
 ]]
 function M.insert_at_index(line, prefix, index)
-    -- If the line is empty, just return the prefix with any whitespace stipped
+    --[[ If the line is empty, just return the prefix with the appropriate
+    amount of whitespace in front of it ]]
     if M.is_empty(line) then
-        return vim.trim(prefix)
+        return string.rep(' ', index-1) .. vim.trim(prefix)
     end
     --[[ If the index is lower than 1 or nil, set it to 1 ]]
     index = index == nil and 1 or index
