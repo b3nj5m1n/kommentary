@@ -110,6 +110,7 @@ Turns the line into a single-line comment.
 @tparam int line_number Line to operate on
 @tparam table configuration The entire config table currently in use
 @treturn nil
+@see comment_in_line_content
 ]]
 function M.comment_in_line(line_number, configuration)
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
@@ -117,6 +118,13 @@ function M.comment_in_line(line_number, configuration)
     vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, lines)
 end
 
+--[[--
+Turns the content string into a single-line comment.
+@tparam string content Single line which is to be turned into a comment
+@tparam table configuration The entire config table currently in use
+@treturn string The line with inserted comment string
+@see comment_in_line
+]]
 function M.comment_in_line_content(content, configuration)
     local comment_string = configuration[1]
     return {util.insert_at_beginning(content, comment_string .. " ")}
@@ -131,6 +139,7 @@ turn into:  `-- This has been commented out 2 times`.
 @tparam int line_number Line to operate on
 @tparam table configuration The entire config table currently in use
 @treturn nil
+@see comment_out_line_content
 ]]
 function M.comment_out_line(line_number, configuration)
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
@@ -140,6 +149,13 @@ function M.comment_out_line(line_number, configuration)
     end
 end
 
+--[[--
+Turns the line, a single-line comment, into normal code.
+@tparam string content Single line which is to be turned into a comment
+@tparam table configuration The entire config table currently in use
+@treturn string The line with removed comment string
+@see comment_out_line
+]]
 function M.comment_out_line_content(content, configuration)
     local comment_string = configuration[1]
     local line, _ = string.gsub(content, vim.pesc(comment_string) .. "%s*", "", 1)
@@ -152,6 +168,7 @@ Turns the range into multiple single-line comments.
 @tparam int line_number_end End of the range, inclusive
 @tparam table configuration The entire config table currently in use
 @treturn nil
+@see comment_in_range_single_content
 ]]
 function M.comment_in_range_single(line_number_start, line_number_end, configuration)
     line_number_start = line_number_start-1
@@ -160,6 +177,13 @@ function M.comment_in_range_single(line_number_start, line_number_end, configura
     vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, lines)
 end
 
+--[[--
+Turns the range into multiple single-line comments.
+@tparam {string,..} content Table of the lines to operate on
+@tparam table configuration The entire config table currently in use
+@treturn string The lines with single-line comment strings insered on each line
+@see comment_in_range_single
+]]
 function M.comment_in_range_single_content(content, configuration)
     local comment_string = configuration[1]
     --[[ This function will return the index at which to insert the comment prefix.
@@ -215,6 +239,7 @@ into multiple single-line comments instead.
 @tparam int line_number_end End of the range, inclusive
 @tparam table configuration The entire config table currently in use
 @treturn nil
+@see comment_in_range_content
 ]]
 function M.comment_in_range(line_number_start, line_number_end, configuration)
     line_number_start = line_number_start-1
@@ -229,6 +254,13 @@ function M.comment_in_range(line_number_start, line_number_end, configuration)
     vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, lines)
 end
 
+--[[--
+Turns the range into a multi-line comment.
+@tparam {string,..} content Table of the lines to operate on
+@tparam table configuration The entire config table currently in use
+@treturn string The lines surrounded with a multi-line comment
+@see comment_in_range
+]]
 function M.comment_in_range_content(content, configuration)
     local comment_strings = configuration[2]
     if #content == 1 then
@@ -254,6 +286,7 @@ Turns the range, multiple single-line comments, into normal code.
 @tparam int line_number_end End of the range, inclusive
 @tparam table configuration The entire config table currently in use
 @treturn nil
+@see comment_out_range_single_content
 ]]
 function M.comment_out_range_single(line_number_start, line_number_end, configuration)
     line_number_start = line_number_start-1
@@ -262,6 +295,13 @@ function M.comment_out_range_single(line_number_start, line_number_end, configur
     vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, lines)
 end
 
+--[[--
+Turns the range, multiple single-line comments, into normal code.
+@tparam {string,..} content Table of the lines to operate on
+@tparam table configuration The entire config table currently in use
+@treturn string The lines with removed comment string
+@see comment_out_range_single
+]]
 function M.comment_out_range_single_content(content, configuration)
     local comment_string = configuration[1]
     local result = {}
@@ -283,6 +323,7 @@ normal code, but remove one *level* of commenting instead.
 @tparam table configuration The entire config table currently in use
 @treturn nil
 @see comment_out_line
+@see comment_out_range_content
 ]]
 function M.comment_out_range(line_number_start, line_number_end, configuration)
     line_number_start = line_number_start-1
@@ -307,6 +348,14 @@ function M.comment_out_range(line_number_start, line_number_end, configuration)
     end
 end
 
+--[[--
+Turns the range, a multi-line comment, into normal code.
+@tparam {string,..} content Table of the lines to operate on
+@tparam table configuration The entire config table currently in use
+@treturn string The lines with removed comment string
+@see comment_out_line
+@see comment_out_range
+]]
 function M.comment_out_range_content(content, configuration)
     local comment_strings = configuration[2]
     local result = {}
