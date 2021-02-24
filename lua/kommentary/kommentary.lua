@@ -112,9 +112,14 @@ Turns the line into a single-line comment.
 @treturn nil
 ]]
 function M.comment_in_line(line_number, configuration)
-    local comment_string = configuration[1]
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
-    vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {util.insert_at_beginning(content, comment_string .. " ")})
+    local lines = M.comment_in_line_content(content, configuration)
+    vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, lines)
+end
+
+function M.comment_in_line_content(content, configuration)
+    local comment_string = configuration[1]
+    return {util.insert_at_beginning(content, comment_string .. " ")}
 end
 
 --[[--
@@ -128,12 +133,17 @@ turn into:  `-- This has been commented out 2 times`.
 @treturn nil
 ]]
 function M.comment_out_line(line_number, configuration)
-    local comment_string = configuration[1]
     local content = vim.api.nvim_buf_get_lines(0, line_number-1, line_number, false)[1]
     if M.is_comment_single(content, configuration) then
-        local result, _ = string.gsub(content, vim.pesc(comment_string) .. "%s*", "", 1)
-        vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, {result})
+        local lines = M.comment_out_line_content(content, configuration)
+        vim.api.nvim_buf_set_lines(0, line_number-1, line_number, false, lines)
     end
+end
+
+function M.comment_out_line_content(content, configuration)
+    local comment_string = configuration[1]
+    local line, _ = string.gsub(content, vim.pesc(comment_string) .. "%s*", "", 1)
+    return {line}
 end
 
 --[[--
@@ -145,8 +155,13 @@ Turns the range into multiple single-line comments.
 ]]
 function M.comment_in_range_single(line_number_start, line_number_end, configuration)
     line_number_start = line_number_start-1
-    local comment_string = configuration[1]
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
+    local lines = M.comment_in_range_single_content(content, configuration)
+    vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, lines)
+end
+
+function M.comment_in_range_single_content(content, configuration)
+    local comment_string = configuration[1]
     --[[ This function will return the index at which to insert the comment prefix.
     in the current state, this function will return the index of the first
     non-whitespace character, if the option for consistent indentation is set,
@@ -189,8 +204,7 @@ function M.comment_in_range_single(line_number_start, line_number_end, configura
                 comment_index(line)))
         end
     end
-    vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false,
-        result)
+    return result
 end
 
 --[[--
@@ -205,31 +219,33 @@ into multiple single-line comments instead.
 function M.comment_in_range(line_number_start, line_number_end, configuration)
     line_number_start = line_number_start-1
     local comment_strings = configuration[2]
-    local content = vim.api.nvim_buf_get_lines(0, line_number_start,
-        line_number_end, false)
     if comment_strings == false then
         -- The language doesn't support multi-line comments
         M.comment_in_range_single(line_number_start, line_number_end, configuration)
-    else
-        local result = {}
-        if line_number_start == line_number_end then
-            result = {util.insert_at_beginning(content, comment_strings[1] .. " ")
-                .. " " .. comment_strings[2]}
-        else
-            result = {}
-            for i, line in ipairs(content) do
-                if i == 1 then
-                    result[i] = util.insert_at_beginning(line,
-                        comment_strings[1] .. " ")
-                else
-                    result[i] = line
-                end
-            end
-            result[#result] = result[#result] .. " " .. comment_strings[2]
-        end
-        vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false,
-            result)
+        return
     end
+    local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
+    local lines = M.comment_in_range_content(content, configuration)
+    vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, lines)
+end
+
+function M.comment_in_range_content(content, configuration)
+    local comment_strings = configuration[2]
+    if #content == 1 then
+        return {util.insert_at_beginning(content, comment_strings[1] .. " ")
+            .. " " .. comment_strings[2]}
+    end
+    local result = {}
+    for i, line in ipairs(content) do
+        if i == 1 then
+            result[i] = util.insert_at_beginning(line,
+                comment_strings[1] .. " ")
+        else
+            result[i] = line
+        end
+    end
+    result[#result] = result[#result] .. " " .. comment_strings[2]
+    return result
 end
 
 --[[--
@@ -241,14 +257,19 @@ Turns the range, multiple single-line comments, into normal code.
 ]]
 function M.comment_out_range_single(line_number_start, line_number_end, configuration)
     line_number_start = line_number_start-1
-    local comment_string = configuration[1]
     local content = vim.api.nvim_buf_get_lines(0, line_number_start, line_number_end, false)
+    local lines = M.comment_out_range_single_content(content, configuration)
+    vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, lines)
+end
+
+function M.comment_out_range_single_content(content, configuration)
+    local comment_string = configuration[1]
     local result = {}
     for _, line in ipairs(content) do
         local new_line, _ = string.gsub(line, vim.pesc(comment_string) .. "%s?", "", 1)
         table.insert(result, new_line)
     end
-    vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
+  return result
 end
 
 --[[--
@@ -271,20 +292,8 @@ function M.comment_out_range(line_number_start, line_number_end, configuration)
     local single_comments_array = comment_strings == false
     if not single_comments_array then
         if M.is_comment_multi(content, configuration) then
-            local result = {}
-            for i, line in ipairs(content) do
-                local new_line = line
-                if i == 1 then
-                    new_line, _ = string.gsub(new_line, vim.pesc(comment_strings[1]) .. "%s*", "", 1)
-                end
-                if i == #content then
-                    -- This will make sure that only the last occurence of the suffix is replaced
-                    local start_index = util.index_last_occurence(new_line, vim.pesc(comment_strings[2]))
-                    new_line, _ = util.gsub_from_index(new_line, "%s*" .. vim.pesc(comment_strings[2]), "", 1, start_index-1)
-                end
-                result[i] = new_line
-            end
-            vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, result)
+            local lines = M.comment_out_range_content(content, configuration)
+            vim.api.nvim_buf_set_lines(0, line_number_start, line_number_end, false, lines)
         else
             single_comments_array = true
         end
@@ -296,6 +305,24 @@ function M.comment_out_range(line_number_start, line_number_end, configuration)
         back here as to not end up with a subraction of 2 ]]
         M.comment_out_range_single(line_number_start+1, line_number_end, configuration)
     end
+end
+
+function M.comment_out_range_content(content, configuration)
+    local comment_strings = configuration[2]
+    local result = {}
+    for i, line in ipairs(content) do
+        local new_line = line
+        if i == 1 then
+            new_line, _ = string.gsub(new_line, vim.pesc(comment_strings[1]) .. "%s*", "", 1)
+        end
+        if i == #content then
+            -- This will make sure that only the last occurence of the suffix is replaced
+            local start_index = util.index_last_occurence(new_line, vim.pesc(comment_strings[2]))
+            new_line, _ = util.gsub_from_index(new_line, "%s*" .. vim.pesc(comment_strings[2]), "", 1, start_index-1)
+        end
+        result[i] = new_line
+    end
+    return result
 end
 
 --[[--
