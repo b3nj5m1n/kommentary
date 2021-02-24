@@ -116,6 +116,34 @@ require('kommentary.config').configure_language("default", {
 EOF
 ```
 
+Additionally, you can use multi-line comment style for single-line comments. For example, CSS does not have a single-line comment style. For these cases, single-line comments can be configured as a table:
+
+```lua
+lua << EOF
+require('kommentary.config').configure_language("css", {
+    -- This also works if your commentstring is set to "/* %s */"
+    single_line_comment_string = {"/*", "*/"},
+    prefer_single_line_comments = true,
+})
+EOF
+```
+
+With the above configuration, commenting multiple lines of CSS looks like so:
+
+```css
+/* .test { */
+/*   color: red; */
+/* } */
+```
+
+Instead of like so:
+
+```css
+/* .test {
+  color: red;
+} */
+```
+
 ### More configuration options
 
 The `configure_language` provides access to two other options, `use_consistent_indentation` and `ignore_whitespace`. Both are set to true by default, but of course you can overwrite that. 

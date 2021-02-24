@@ -259,8 +259,13 @@ function M.config_from_commentstring(commentstring)
     if index_placeholder + #placeholder == #commentstring then
         return {vim.trim(commentstring:sub(1, -#placeholder-1)), false}
     end
-    return {false, {vim.trim(commentstring:sub(1, index_placeholder)),
-        vim.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1))}}
+
+    local comment_string = {
+        vim.trim(commentstring:sub(1, index_placeholder)),
+        vim.trim(commentstring:sub(index_placeholder + #placeholder + 1, -1))
+    }
+
+    return {comment_string, comment_string}
 end
 
 --[[--

@@ -19,7 +19,15 @@ function M.is_comment_single(line, configuration)
     -- Since the line might be indented, trim all whitespace
     local comment_string = configuration[1]
     line = vim.trim(line)
-    return line:sub(1, #comment_string) == comment_string
+
+    if type(comment_string) == "table" then
+        local comment_start = comment_string[1]
+        local comment_end = comment_string[2]
+        return line:sub(1, #comment_start) == comment_start and
+          line:sub(#line - #comment_end + 1) == comment_end
+    elseif type(comment_string) == "string" then
+        return line:sub(1, #comment_string) == comment_string
+    end
 end
 
 --[[--
@@ -223,6 +231,13 @@ function M.comment_in_range_single_content(content, configuration)
         of only whitespace, insert it back into result as-is. ]]
         if configuration[6] == true and util.is_empty(line) == true then
             table.insert(result, line)
+        elseif type(comment_string) == "table" then
+            table.insert(
+                result,
+                util.insert_at_index(
+                  line, comment_string[1] .. " ", comment_index(line)
+                ) .. " " .. comment_string[2]
+            )
         else
             table.insert(result, util.insert_at_index(line, comment_string .. " ",
                 comment_index(line)))
@@ -306,8 +321,24 @@ function M.comment_out_range_single_content(content, configuration)
     local comment_string = configuration[1]
     local result = {}
     for _, line in ipairs(content) do
-        local new_line, _ = string.gsub(line, vim.pesc(comment_string) .. "%s?", "", 1)
-        table.insert(result, new_line)
+        if type(comment_string) == "table" then
+            local new_line, _ = string.gsub(
+                line,
+                vim.pesc(comment_string[1]) .. "%s?",
+                "",
+                1
+            )
+            new_line, _ = string.gsub(
+                new_line,
+                "%s?" .. vim.pesc(comment_string[2]),
+                "",
+                1
+            )
+            table.insert(result, new_line)
+        else
+            local new_line, _ = string.gsub(line, vim.pesc(comment_string) .. "%s?", "", 1)
+            table.insert(result, new_line)
+        end
     end
   return result
 end
