@@ -118,7 +118,7 @@ EOF
 
 ### More configuration options
 
-The `configure_language` provides access to two other options, `use_consistent_indentation` and `ignore_whitespace`. Both are set to true by default, but of course you can overwrite that. 
+The `configure_language` provides access to two other options, `use_consistent_indentation` and `ignore_whitespace`. Both are set to true by default, but of course you can overwrite that.
 
 #### `use_consistent_indentation`
 
@@ -154,7 +154,7 @@ Instead of
 -- function test_function_1()
 --     print("test")
 -- end
--- 
+--
 -- function test_function_2()
 --     print("test")
 -- end
@@ -163,7 +163,7 @@ Instead of
 ### Advanced configuration
 
 This plugin allows for very individual configuration, pretty much every operation the plugin does is broken up into smaller functions, all of which are exposed and can be called in a custom function, which you can easily assign to a mapping of your choice, meaning you can incorporate some of the functionality of this plugin into your own lua functions.
-For more information, you can either read the source code (I do my best to leave helpful comments) or build the documentation.
+For more information, you can either read the source code (I do my best to leave helpful comments) or build the [documentation](README.md#Documentation).
 
 Here is a simple example in which this plugin only plays a minor role, so it should be easy to understand (If you're a little familiar with neovim's lua api). We'll create mapping that, when called, inserts a new comment under the current line and puts us in insert mode.
 
