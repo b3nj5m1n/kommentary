@@ -264,7 +264,7 @@ Turns the range into a multi-line comment.
 function M.comment_in_range_content(content, configuration)
     local comment_strings = configuration[2]
     if #content == 1 then
-        return {util.insert_at_beginning(content, comment_strings[1] .. " ")
+        return {util.insert_at_beginning(content[1], comment_strings[1] .. " ")
             .. " " .. comment_strings[2]}
     end
     local result = {}
