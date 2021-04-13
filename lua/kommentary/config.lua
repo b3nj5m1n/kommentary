@@ -296,7 +296,10 @@ function M.get_config(filetype)
     end
     local result = nil
     if M.has_filetype(filetype) then
-        M.config[filetype][7]()
+        hook = M.config[filetype][7]
+        if hook ~= nil then
+            hook()
+        end
         result = {unpack(M.config[filetype])}
     else
         --[[ We can't get the commentstring for a filetype different from the
