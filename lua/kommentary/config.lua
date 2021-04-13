@@ -67,7 +67,7 @@ function M.get_lang_default(language)
     if M.config[language] ~= nil then
         return M.config[language]
     end
-    return M.get_default_config
+    return M.get_default_config()
 end
 
 function M.add_keymap(mode, name, context, options, callback)
