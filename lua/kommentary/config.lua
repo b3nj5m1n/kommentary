@@ -8,9 +8,10 @@ local util = require("kommentary.util")
 --[[ The default values that will be used if commentstring isn't set,
 and that will be used to fill in any missing values in user configuration.  Read:
 single-line commentstring, multi-line commentstring, prefer multi-line comments,
-prefer single-line comments, use consistent indentation, ignore empty lines. ]]
+prefer single-line comments, use consistent indentation, ignore empty lines,
+pre-execute hook function. ]]
 local M = {}
-local default = {"//", {"/*", "*/"}, false, false, true, true}
+local default = {"//", {"/*", "*/"}, false, false, true, true, nil}
 function M.get_default_config() return default end
 function M.set_default_config(new_default) default = new_default end
 --[[ These are the available modes that can be passed to
@@ -196,9 +197,10 @@ Interface for creating configuration entries.
         dont_fill_defaults  by default, for options not provided in the options table,
             the option will be set according to the default value of that option,
             if this option is present, options not provided will be left at nil.
+        hook_function (function) a function to call before returning a config
 ]]
 function M.configure_language(language, options)
-    local result = {nil, nil, nil, nil, nil}
+    local result = {nil, nil, nil, nil, nil, nil}
     local dont_fill_defaults = options.dont_fill_defaults ~= nil
     local defaults = M.get_lang_default(language)
     if dont_fill_defaults then
@@ -236,6 +238,11 @@ function M.configure_language(language, options)
         result[6] = options.ignore_whitespace
     elseif not dont_fill_defaults then
         result[6] = defaults[6]
+    end
+    if options.hook_function ~= nil then
+        result[7] = options.hook_function
+    elseif not dont_fill_defaults then
+        result[7] = defaults[7]
     end
     if language == "default" then
         M.set_default_config(result)
@@ -288,13 +295,14 @@ function M.get_config(filetype)
         filetype = vim.bo.filetype
     end
     local result = nil
-    if not M.has_filetype(filetype) then
+    if M.has_filetype(filetype) then
+        M.config[filetype][7]()
+        result = {unpack(M.config[filetype])}
+    else
         --[[ We can't get the commentstring for a filetype different from the
         current buffer, so in that case always return the default ]]
         result = filetype == vim.bo.filetype
             and M.config_from_commentstring(vim.bo.commentstring) or M.get_default_config()
-    else
-        result = {unpack(M.config[filetype])}
     end
     -- Fill in missing or "default" fields
     for i = 1,6,1 do
