@@ -62,6 +62,13 @@ M.config = {
     ["typescriptreact"] = {"auto", "auto"},
 }
 
+function M.get_lang_default(language)
+    if M.config[language] ~= nil then
+        return M.config[language]
+    end
+    return M.get_default_config
+end
+
 function M.add_keymap(mode, name, context, options, callback)
     local default_options = { noremap = true, silent = true, expr = false }
     if options ~= nil then
@@ -193,38 +200,42 @@ Interface for creating configuration entries.
 function M.configure_language(language, options)
     local result = {nil, nil, nil, nil, nil}
     local dont_fill_defaults = options.dont_fill_defaults ~= nil
+    local defaults = M.get_lang_default(language)
+    if dont_fill_defaults then
+        defaults = {nil, nil, nil, nil, nil}
+    end
     --[[ For every option available, test if it present in the provided options table,
     if so, set the value from the provided options, if not, and fill_defaults is
     enabled, set to the default value. ]]
     if options.single_line_comment_string ~= nil then
         result[1] = options.single_line_comment_string
     elseif not dont_fill_defaults then
-        result[1] = M.get_default_config()[1]
+        result[1] = defaults[1]
     end
     if options.multi_line_comment_strings ~= nil then
         result[2] = options.multi_line_comment_strings
     elseif not dont_fill_defaults then
-        result[2] = M.get_default_config()[2]
+        result[2] = defaults[2]
     end
     if options.prefer_single_line_comments ~= nil then
         result[3] = options.prefer_single_line_comments
     elseif not dont_fill_defaults then
-        result[3] = M.get_default_config()[3]
+        result[3] = defaults[3]
     end
     if options.prefer_multi_line_comments ~= nil then
         result[4] = options.prefer_multi_line_comments
     elseif not dont_fill_defaults then
-        result[4] = M.get_default_config()[4]
+        result[4] = defaults[4]
     end
     if options.use_consistent_indentation ~= nil then
         result[5] = options.use_consistent_indentation
     elseif not dont_fill_defaults then
-        result[5] = M.get_default_config()[5]
+        result[5] = defaults[5]
     end
     if options.ignore_whitespace ~= nil then
         result[6] = options.ignore_whitespace
     elseif not dont_fill_defaults then
-        result[6] = M.get_default_config()[6]
+        result[6] = defaults[6]
     end
     if language == "default" then
         M.set_default_config(result)
