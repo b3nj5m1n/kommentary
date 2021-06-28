@@ -41,10 +41,10 @@ Which behind the scenes calls the following chunk of code, which you could also 
 ```lua
 vim.api.nvim_set_keymap("n", "<leader>cic", "<Plug>kommentary_line_increase", {})
 vim.api.nvim_set_keymap("n", "<leader>ci", "<Plug>kommentary_motion_increase", {})
-vim.api.nvim_set_keymap("v", "<leader>ci", "<Plug>kommentary_visual_increase", {})
+vim.api.nvim_set_keymap("x", "<leader>ci", "<Plug>kommentary_visual_increase", {})
 vim.api.nvim_set_keymap("n", "<leader>cdc", "<Plug>kommentary_line_decrease", {})
 vim.api.nvim_set_keymap("n", "<leader>cd", "<Plug>kommentary_motion_decrease", {})
-vim.api.nvim_set_keymap("v", "<leader>cd", "<Plug>kommentary_visual_decrease", {})
+vim.api.nvim_set_keymap("x", "<leader>cd", "<Plug>kommentary_visual_decrease", {})
 ```
 
 If you don't want to use the default mappings, you can disable the creation of those using the `kommentary_create_default_mappings` variable. Be sure to set the value *before* the plugin is loaded though.
@@ -56,7 +56,7 @@ You can then map those actions yourself (You might need to do that *after* the p
 ```lua
 vim.api.nvim_set_keymap("n", "<leader>cc", "<Plug>kommentary_line_default", {})
 vim.api.nvim_set_keymap("n", "<leader>c", "<Plug>kommentary_motion_default", {})
-vim.api.nvim_set_keymap("v", "<leader>c", "<Plug>kommentary_visual_default", {})
+vim.api.nvim_set_keymap("x", "<leader>c", "<Plug>kommentary_visual_default", {})
 ```
 
 ## Configuration
