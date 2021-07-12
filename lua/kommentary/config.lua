@@ -99,20 +99,20 @@ function M.setup()
     which would be multi-line comment-style if the range is longer than one line. ]]
     M.add_keymap("n", "kommentary_motion_default", M.context.init, { expr = true })
     M.add_keymap("n", "kommentary_line_default", M.context.line)
-    M.add_keymap("v", "kommentary_visual_default", M.context.visual)
+    M.add_keymap("x", "kommentary_visual_default", M.context.visual)
     -- Increase comment level
     M.add_keymap("n", "kommentary_motion_increase", M.context.init, { expr = true },
         "kommentary.increase_comment_level")
     M.add_keymap("n", "kommentary_line_increase", M.context.line, {},
         "kommentary.increase_comment_level")
-    M.add_keymap("v", "kommentary_visual_increase", M.context.visual, {},
+    M.add_keymap("x", "kommentary_visual_increase", M.context.visual, {},
         "kommentary.increase_comment_level")
     -- Decrease comment level
     M.add_keymap("n", "kommentary_motion_decrease", M.context.init, { expr = true },
         "kommentary.decrease_comment_level")
     M.add_keymap("n", "kommentary_line_decrease", M.context.line, {},
         "kommentary.decrease_comment_level")
-    M.add_keymap("v", "kommentary_visual_decrease", M.context.visual, {},
+    M.add_keymap("x", "kommentary_visual_decrease", M.context.visual, {},
         "kommentary.decrease_comment_level")
 
   --[[ If the user has set the g:kommentary_create_default_mappings variable,
@@ -133,7 +133,7 @@ function M.use_default_mappings()
     --[[ The default mapping for visual selections; will toggle the range from
     commented to not-commented and vice-versa, will use multi-line comments when
     the range is longer than 1 line, otherwise it will use a single-line comment. ]]
-    vim.api.nvim_set_keymap("v", "gc", "<Plug>kommentary_visual_default", {})
+    vim.api.nvim_set_keymap("x", "gc", "<Plug>kommentary_visual_default", {})
     --[[ The default mapping for motions; will toggle the range from commented to
     not-commented and vice-versa, will use multi-line comments when the range
     is longer than 1 line, otherwise it will use a single-line comment. ]]
@@ -146,10 +146,10 @@ Creates mappings for in/decreasing comment level.
 function M.use_extended_mappings()
     vim.api.nvim_set_keymap("n", "<leader>cic", "<Plug>kommentary_line_increase", {})
     vim.api.nvim_set_keymap("n", "<leader>ci", "<Plug>kommentary_motion_increase", {})
-    vim.api.nvim_set_keymap("v", "<leader>ci", "<Plug>kommentary_visual_increase", {})
+    vim.api.nvim_set_keymap("x", "<leader>ci", "<Plug>kommentary_visual_increase", {})
     vim.api.nvim_set_keymap("n", "<leader>cdc", "<Plug>kommentary_line_decrease", {})
     vim.api.nvim_set_keymap("n", "<leader>cd", "<Plug>kommentary_motion_decrease", {})
-    vim.api.nvim_set_keymap("v", "<leader>cd", "<Plug>kommentary_visual_decrease", {})
+    vim.api.nvim_set_keymap("x", "<leader>cd", "<Plug>kommentary_visual_decrease", {})
 end
 
 --[[--
