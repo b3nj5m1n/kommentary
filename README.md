@@ -236,22 +236,12 @@ Then you can access it from doc/index.html
 
 ### Tests
 
-There are unit tests available in the directory `lua/test`, you'll need to have [luaunit](https://github.com/bluebird75/luaunit) installed, then run:
-```sh
-cd ./lua/
-lua test/test_util.lua
+Thanks to @YodaEmbedding, there are now proper unit tests available.
 
-# You might need to specify the lua version because luaunit doesn't support the latest ones
-# lua5.3 test/test_util.lua
+Make sure [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) is installed, then navigate to the lua directory.
 
-# For verbose output (Which tests are being run)
-# lua test/test_util.lua -v
+From here, you can run the tests with the following command:
+
+```bash
+nvim --headless -c "PlenaryBustedDirectory test/"
 ```
-
-Or to run all tests:
-```sh
-cd ./lua/
-./run_tests.sh
-```
-
-Atm, these unit tests don't cover a lot of the plugin because with luaunit we don't have access to the neovim api, meaning these aren't really that useful. They're also often outdated.
