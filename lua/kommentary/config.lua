@@ -47,6 +47,7 @@ M.config = {
     ["clojure"] = {";", {"(comment ", " )"}},
     ["cpp"] = {},
     ["cs"] = {},
+    ["elixir"] = {"#", false, true},
     ["fennel"] = {";", false},
     ["go"] = {},
     ["haskell"] = {"--", {"{-", "-}"}},
