@@ -134,7 +134,7 @@ function M.use_default_mappings()
     --[[ The default mapping for visual selections; will toggle the range from
     commented to not-commented and vice-versa, will use multi-line comments when
     the range is longer than 1 line, otherwise it will use a single-line comment. ]]
-    vim.api.nvim_set_keymap("x", "gc", "<Plug>kommentary_visual_default", {})
+    vim.api.nvim_set_keymap("x", "gc", "<Plug>kommentary_visual_default<C-c>", {})
     --[[ The default mapping for motions; will toggle the range from commented to
     not-commented and vice-versa, will use multi-line comments when the range
     is longer than 1 line, otherwise it will use a single-line comment. ]]

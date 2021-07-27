@@ -59,6 +59,14 @@ vim.api.nvim_set_keymap("n", "<leader>c", "<Plug>kommentary_motion_default", {})
 vim.api.nvim_set_keymap("x", "<leader>c", "<Plug>kommentary_visual_default", {})
 ```
 
+Originally, commenting in visual mode would not cancel the selection, after many requests this has been changed to the default behavior of vim-commentary. If you want the old behavior, disable the creation of the default mappings and then load the old ones:
+
+```lua
+vim.api.nvim_set_keymap("n", "gcc", "<Plug>kommentary_line_default", {})
+vim.api.nvim_set_keymap("n", "gc", "<Plug>kommentary_motion_default", {})
+vim.api.nvim_set_keymap("v", "gc", "<Plug>kommentary_visual_default<C-c>", {})
+```
+
 ## Configuration
 
 For most users, configuration should hardly be necessary, I try to provide sane defaults and the plugin, once installed, can basically be used as a drop-in replacement for vim-commentary. That being said, maybe you have some different preferences, or you like your editor heavily customised, this plugin should still have you covered.
