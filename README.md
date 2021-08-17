@@ -6,8 +6,11 @@ Neovim plugin to comment text in and out, written in lua. Supports commenting ou
 
 ## Getting started
 
-### Install
+### Requirements
 
+- Neovim 0.5+
+
+### Install
 You can install the plugin using your favorite plugin manager, just make sure you remove any plugins that might conflict with this one, such as vim-commentary.
 
 #### Packer
@@ -230,7 +233,8 @@ If you found a bug or want to request a feature, pleases do so by [raising an is
 5. Push to the Branch (`git push origin amazing_feature`)
 6. Open a Pull Request
 
-Please try your best to follow the style of the rest of the codebase, even though there's no official spec or linter for it. (Try not to exceed 80 lines, use snake_case)
+Please try your best to follow the style of the rest of the codebase, even though there's no official spec or linter for
+it. (Try not to exceed 80 characters per line, use snake_case)
 
 ### Documentation
 
