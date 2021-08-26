@@ -200,7 +200,7 @@ Interface for creating configuration entries.
             if this option is present, options not provided will be left at nil.
         hook_function (function) a function to call before returning a config
 ]]
-function M.configure_language(language, options)
+local function configure_single_language(language, options)
     local result = {nil, nil, nil, nil, nil, nil}
     local dont_fill_defaults = options.dont_fill_defaults ~= nil
     local defaults = M.get_lang_default(language)
@@ -250,6 +250,16 @@ function M.configure_language(language, options)
         return
     end
     M.config[language] = result
+end
+
+function M.configure_language(language, options)
+  if type(language) == 'table' then
+    for _, lang in ipairs(language) do
+      configure_single_language(lang, options)
+    end
+  elseif type(language) == 'string' then
+    configure_single_language(language, options)
+  end
 end
 
 --[[--
