@@ -171,6 +171,18 @@ Instead of
 -- end
 ```
 
+### Configure multiple languages at once
+
+Thanks to @pedro757, you can also set the same options for multiple languages by supplying a list of languages:
+
+```lua
+lua << EOF
+require('kommentary.config').configure_language({"c", "rust"}, {
+    prefer_single_line_comments = true,
+})
+EOF
+```
+
 ### Advanced configuration
 
 This plugin allows for very individual configuration, pretty much every operation the plugin does is broken up into smaller functions, all of which are exposed and can be called in a custom function, which you can easily assign to a mapping of your choice, meaning you can incorporate some of the functionality of this plugin into your own lua functions.
