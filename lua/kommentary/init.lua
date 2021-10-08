@@ -41,13 +41,7 @@ function M.go(...)
     --[[ The first argument passed to this function represents one of 3 possible
     contexts in which this function can be called. ]]
     local calling_context = args[1]
-    local line_number_start = nil
-    local line_number_end = nil
-    --[[ If the second argument is not nil, it's a string representing the name
-    of the new callback function ]]
-    if type(args[2]) == "string" then
-        M.set_callback_function(args[2])
-    end
+    local map_name = args[2]
     --[[ When called with the calling context of init (This would be for triggered
     by gc for example) return g@ (Which has to be inserted into the mapping literaly,
     meaning the mapping has to be an <expr>) and set the operatorfunc, which is the
@@ -57,58 +51,53 @@ function M.go(...)
     if you now do a motion like 5j, the operatorfunc gets called with a special,
     automatically set argument containing information about the nature of the motion.
     For more information, see :h operatorfunc. ]]
-    if calling_context == context.init then
-        vim.api.nvim_set_option('operatorfunc', 'v:lua.kommentary.go')
-        return "g@"
+    -- if calling_context == context.init then
+        -- vim.api.nvim_set_option('operatorfunc', 'v:lua.kommentary.go')
+        -- return "g@"
+    -- end
+    if calling_context == context.visual then
+        M.create_next_toggle_func(calling_context, util.callbacks[map_name])()
+        return
     end
+
+    M.next_toggle_func = M.create_next_toggle_func(calling_context, util.callbacks[map_name])
+    vim.api.nvim_set_option('operatorfunc', 'v:lua.kommentary.next_toggle_func')
+    return 'g@' .. (calling_context==context.motion and '' or 'l')        
+end
+
+M.next_toggle_func = function() 
+    return
+end
+function M.create_next_toggle_func(calling_context, callback)
+     return function()
+        local line_number_start, line_number_end, new_calling_context = M.get_lines_from_context(calling_context)
+        if callback ~= nil then
+            callback(line_number_start, line_number_end, calling_context, {
+                config = config,
+                kommentary = kommentary,
+                modes = modes
+            })
+        else 
+            M.toggle_comment(line_number_start, line_number_end, new_calling_context)
+        end
+    end
+end
+
+function M.get_lines_from_context(calling_context)
+    local line_number_start = nil
+    local line_number_end = nil
     if calling_context == context.line then
-        line_number_start = vim.api.nvim_win_get_cursor(0)[1]
-    line_number_end = line_number_start
+        line_number_start = vim.fn.line('.')
+        line_number_end = line_number_start
     elseif calling_context == context.visual then
-        --[[ vim.fn.getpos will return the position of something,
-        if you pass 'v' as an argument you will get the start of a
-        visual selection, vim.fn.getcurspos will return the current
-        position of the cursor, so the end of the visual selection. ]]
-        line_number_start = vim.fn.getpos('v')[2]
-        line_number_end = vim.fn.getcurpos()[2]
-    --[[ When executing a motion after g@, operatorfunc will be
-    called with one of these 3 strings as an argument indicating
-    on what the motion operates, we use it to detect if this function
-    is being called after a motion ]]
-    elseif args[1] == "line" or
-        args[1] == "char" or
-        args[1] == "block" then
-        --[[ When using g@, the marks [ and ] will contain the position of the
-        start and the end of the motion, respectively. vim.fn.getpos() returns
-        a tuple with the line and column of the position. ]]
+        line_number_start = vim.fn.line('v')
+        line_number_end = vim.fn.line('.')
+    elseif calling_context == context.motion then
         line_number_start = vim.fn.getpos("'[")[2]
         line_number_end = vim.fn.getpos("']")[2]
         calling_context = context.motion
     end
-    if M.get_callback_function() == nil then
-        M.toggle_comment(line_number_start, line_number_end, calling_context)
-    else
-        --[[ Looks pretty bad, doesn't it. So when you set operatorfunc, you have to
-        put the name of the function, without any () since when you press g@,
-        vim will automatically pass an argument to the operatorfunc. This means
-        that we can't specify any arguments for the go function when we're calling
-        from a motion. Because of that, we store the function in a global variable,
-        but we can't simply use the function there, because that can't be properly
-        converted to viml internally, meaning we store the function name instead.
-        But now we have to call that function, and the way we do that is using
-        lua's load function, which is essentially an eval(), meaning it executes
-        lua code from a string. Only that it doesn't execute the code, but it turns
-        it into a callable function, and if you execute the return of load() as
-        a function, what was in the string gets executed, provided that it was a
-        proper function call. So, here we string together said function call.
-        Now writing this, I probably missed something really obvious, didn't I? ]]
-        local callback_function = load(M.get_callback_function()
-            ..  '(' .. line_number_start .. ', ' .. line_number_end
-            .. ', ' .. calling_context .. ')')
-        callback_function()
-    end
-    -- We need to make sure we unset the callaback function now.
-    M.set_callback_function(nil)
+    return line_number_start, line_number_end, calling_context
 end
 
 function M.toggle_comment(...)
@@ -116,29 +105,6 @@ function M.toggle_comment(...)
     local line_number_start, line_number_end = args[1], args[2]
     -- local calling_context = args[3]
     kommentary.toggle_comment_range(line_number_start, line_number_end, modes.normal)
-end
-
-function M.increase_comment_level(...)
-    local args = {...}
-    local line_number_start, line_number_end = args[1], args[2]
-    if line_number_start > line_number_end then
-        line_number_start, line_number_end = line_number_end, line_number_start
-    end
-    local mode = config.get_mode(line_number_start, line_number_end, modes.normal)
-    if mode == modes.force_single then
-        kommentary.comment_in_range_single(line_number_start, line_number_end, config.get_config(0))
-    else
-        kommentary.comment_in_range(line_number_start, line_number_end, config.get_config(0))
-    end
-end
-
-function M.decrease_comment_level(...)
-    local args = {...}
-    local line_number_start, line_number_end = args[1], args[2]
-    if line_number_start > line_number_end then
-        line_number_start, line_number_end = line_number_end, line_number_start
-    end
-    kommentary.comment_out_range(line_number_start, line_number_end, config.get_config(0))
 end
 
 function M.toggle_comment_singles(...)

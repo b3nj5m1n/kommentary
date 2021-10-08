@@ -18,7 +18,7 @@ function M.set_default_config(new_default) default = new_default end
 --[[ These are the available modes that can be passed to
 `kommentary.go`, we need to choose the appropriate one for
 each mapping depending on the mode of the mapping ]]
-M.context = util.enum({"line", "visual", "motion", "init"})
+M.context = util.enum({"line", "visual", "motion"})
 
 --[[--
 The default configuration, will be overwriten by user defined config.
@@ -74,10 +74,12 @@ end
 
 function M.add_keymap(mode, name, context, options, callback)
     local default_options = { noremap = true, silent = true, expr = false }
-    if options ~= nil then
-        for option, value in pairs(options) do
-            default_options[option] = value
-        end
+    -- if options ~= nil then
+    --     for option, value in pairs(options) do
+    --         default_options[option] = value
+    --     end
+    -- end
+    default_options = vim.tbl_extend('force', default_options, options or {})
     if callback ~= nil then
         util.callbacks[name] = callback
     end
