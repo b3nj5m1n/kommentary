@@ -5,27 +5,10 @@ This module handles the initialization of the plugin.
 ]]
 local kommentary = require("kommentary.kommentary")
 local config = require("kommentary.config")
+local util = require("kommentary.util")
 local M = {}
 local context = config.context
 local modes = config.get_modes()
-
---[[ Since no custom arguments can be passed to operatorfunc, we need to store a
-potential custom callback function on initialization ]]
---[[--
-Sets the global callback function.
-@tparam string callback_function the name of the function to be called by go()
-        Only put the function name, no () or args
-]]
-function M.set_callback_function(callback_function)
-    vim.api.nvim_set_var("kommentary_callback_function", callback_function)
-end
---[[--
-Retrieves the global callback function.
-@treturn string returns the name of the global callback function
-]]
-function M.get_callback_function()
-    return vim.api.nvim_get_var("kommentary_callback_function")
-end
 
 --[[--
 Function to be called by mappings.

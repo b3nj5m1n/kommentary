@@ -106,5 +106,6 @@ function M.enum(items)
     return table
 end
 
+M.callbacks = {}
 
 return M
