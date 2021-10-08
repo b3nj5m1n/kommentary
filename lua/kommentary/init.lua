@@ -62,6 +62,7 @@ function M.go(...)
 
     M.next_toggle_func = M.create_next_toggle_func(calling_context, util.callbacks[map_name])
     vim.api.nvim_set_option('operatorfunc', 'v:lua.kommentary.next_toggle_func')
+    print('Starting mapping')
     return 'g@' .. (calling_context==context.motion and '' or 'l')        
 end
 
@@ -70,15 +71,11 @@ M.next_toggle_func = function()
 end
 function M.create_next_toggle_func(calling_context, callback)
      return function()
-        local line_number_start, line_number_end, new_calling_context = M.get_lines_from_context(calling_context)
+        local line_number_start, line_number_end = M.get_lines_from_context(calling_context)
         if callback ~= nil then
-            callback(line_number_start, line_number_end, calling_context, {
-                config = config,
-                kommentary = kommentary,
-                modes = modes
-            })
+            callback(line_number_start, line_number_end, calling_context)
         else 
-            M.toggle_comment(line_number_start, line_number_end, new_calling_context)
+            M.toggle_comment(line_number_start, line_number_end, calling_context)
         end
     end
 end
@@ -95,9 +92,8 @@ function M.get_lines_from_context(calling_context)
     elseif calling_context == context.motion then
         line_number_start = vim.fn.getpos("'[")[2]
         line_number_end = vim.fn.getpos("']")[2]
-        calling_context = context.motion
     end
-    return line_number_start, line_number_end, calling_context
+    return line_number_start, line_number_end
 end
 
 function M.toggle_comment(...)

@@ -1,12 +1,9 @@
 local M = {}
 
-function M.increase_comment_level(line_number_start, line_number_end, calling_context, deps)
-    local config = deps.config
-    local kommentary = deps.kommentary
-    local modes = deps.modes
-    if config == nil or kommentary == nil or modes == nil then
-        error('Argument "deps" incomplete')
-    end
+function M.increase_comment_level(line_number_start, line_number_end, calling_context)
+    local config = require('kommentary.config')
+    local kommentary = require('kommentary.kommentary')
+    local modes = config.get_modes()
     if line_number_start > line_number_end then
         line_number_start, line_number_end = line_number_end, line_number_start
     end
@@ -18,12 +15,9 @@ function M.increase_comment_level(line_number_start, line_number_end, calling_co
     end
 end
 
-function M.decrease_comment_level(line_number_start, line_number_end, calling_context, deps)
-    local config = deps.config
-    local kommentary = deps.kommentary
-    if config == nil or kommentary == nil then
-        error('Argument "deps" incomplete')
-    end
+function M.decrease_comment_level(line_number_start, line_number_end, calling_context)
+    local config = require('kommentary.config')
+    local kommentary = require('kommentary.kommentary')
     if line_number_start > line_number_end then
         line_number_start, line_number_end = line_number_end, line_number_start
     end
