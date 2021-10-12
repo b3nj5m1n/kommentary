@@ -106,6 +106,7 @@ function M.enum(items)
     return table
 end
 
+-- Holds the callback functions to be used for custom mapping
 M.callbacks = {}
 
 return M
