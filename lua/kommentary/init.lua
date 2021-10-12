@@ -59,7 +59,6 @@ function M.go(...)
 
     M.next_toggle_func = M.create_next_toggle_func(calling_context, util.callbacks[map_name])
     vim.api.nvim_set_option('operatorfunc', 'v:lua.kommentary.next_toggle_func')
-    print('Starting mapping')
     return 'g@' .. (calling_context==context.motion and '' or 'l')
 end
 
