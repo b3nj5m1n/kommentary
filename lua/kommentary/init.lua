@@ -52,10 +52,6 @@ function M.go(...)
     operatorfunc with a dummy motion 'l', which is ignored in the handler
     for linewise commenting. By returning 'g@', the '.' operator can now
     repeat linewise and motion commenting by calling operatorfunc again]]
-    -- if calling_context == context.init then
-        -- vim.api.nvim_set_option('operatorfunc', 'v:lua.kommentary.go')
-        -- return "g@"
-    -- end
     if calling_context == context.visual then
         M.create_next_toggle_func(calling_context, util.callbacks[map_name])()
         return
@@ -106,7 +102,6 @@ end
 function M.toggle_comment(...)
     local args = {...}
     local line_number_start, line_number_end = args[1], args[2]
-    -- local calling_context = args[3]
     kommentary.toggle_comment_range(line_number_start, line_number_end, modes.normal)
 end
 

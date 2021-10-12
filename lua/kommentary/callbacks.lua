@@ -1,6 +1,6 @@
 local M = {}
 
-function M.increase_comment_level(line_number_start, line_number_end, calling_context)
+function M.increase_comment_level(line_number_start, line_number_end, _)
     local config = require('kommentary.config')
     local kommentary = require('kommentary.kommentary')
     local modes = config.get_modes()
@@ -15,7 +15,7 @@ function M.increase_comment_level(line_number_start, line_number_end, calling_co
     end
 end
 
-function M.decrease_comment_level(line_number_start, line_number_end, calling_context)
+function M.decrease_comment_level(line_number_start, line_number_end, _)
     local config = require('kommentary.config')
     local kommentary = require('kommentary.kommentary')
     if line_number_start > line_number_end then

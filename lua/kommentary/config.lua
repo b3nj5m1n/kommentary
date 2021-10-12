@@ -74,16 +74,10 @@ end
 
 function M.add_keymap(mode, name, context, options, callback)
     local default_options = { noremap = true, silent = true, expr = false }
-    -- if options ~= nil then
-    --     for option, value in pairs(options) do
-    --         default_options[option] = value
-    --     end
-    -- end
     default_options = vim.tbl_extend('force', default_options, options or {})
     if callback ~= nil then
         util.callbacks[name] = callback
     end
-    -- callback = (callback ~= nil and ', ' .. "'" ..  callback .. "'" or '')
     local action = (default_options["expr"] == true and '' or '<cmd>call ')
         .. 'v:lua.kommentary.go(' .. context .. ',' .. '"' .. name .. '"' .. ')'
         .. (default_options["expr"] == true and '' or '<cr>')
@@ -95,8 +89,6 @@ end
 Set up keymappings.
 ]]
 function M.setup()
-    -- This is the global variable holding the callback function to be called by go()
-    -- vim.api.nvim_set_var("kommentary_callback_function", nil)
     --[[ The naming convention for these keymappings is: <Plug>kommentary_mode_suffix
     where suffix is either default, if it's the default behaviour, or a keyword
     indicating what is special about this mapping, for example consider the
