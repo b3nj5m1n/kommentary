@@ -192,10 +192,11 @@ Here is a simple example in which this plugin only plays a minor role, so it sho
 
 ```lua
 local config = require('kommentary.config')
+local M = {}
 
 --[[ This function will be called automatically by the mapping, the first
 argument will be the line that is being operated on. ]]
-function insert_comment_below(...)
+function M.insert_comment_below(...)
     local args = {...}
     -- This includes the commentstring
     local configuration = config.get_config(0)
@@ -222,9 +223,11 @@ end
 setting up a <Plug> mapping. The last argument is the optional callback
 function, meaning when we execute this mapping, this function will be
 called instead of the default. --]]
-config.add_keymap("n", "kommentary_insert_below", config.context.line, {}, "insert_comment_below")
+config.add_keymap("n", "kommentary_insert_below", config.context.line, { expr = true }, M.insert_comment_below)
 -- Set up a regular keymapping to the new <Plug> mapping
 vim.api.nvim_set_keymap('n', '<leader>co', '<Plug>kommentary_insert_below', { silent = true })
+
+return M
 ```
 
 
