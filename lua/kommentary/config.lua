@@ -5,6 +5,7 @@ This module contains the mappings of comment strings to filetypes, as well as
 convenience functions for retrieving configuration parameters.
 ]]
 local util = require("kommentary.util")
+local callbacks = require("kommentary.callbacks")
 --[[ The default values that will be used if commentstring isn't set,
 and that will be used to fill in any missing values in user configuration.  Read:
 single-line commentstring, multi-line commentstring, prefer multi-line comments,
@@ -17,7 +18,7 @@ function M.set_default_config(new_default) default = new_default end
 --[[ These are the available modes that can be passed to
 `kommentary.go`, we need to choose the appropriate one for
 each mapping depending on the mode of the mapping ]]
-M.context = util.enum({"line", "visual", "motion", "init"})
+M.context = util.enum({"line", "visual", "motion"})
 
 --[[--
 The default configuration, will be overwriten by user defined config.
@@ -73,16 +74,14 @@ end
 
 function M.add_keymap(mode, name, context, options, callback)
     local default_options = { noremap = true, silent = true, expr = false }
-    if options ~= nil then
-        for option, value in pairs(options) do
-            default_options[option] = value
-        end
+    default_options = vim.tbl_extend('force', default_options, options or {})
+    if callback ~= nil then
+        util.callbacks[name] = callback
     end
-    name = '<Plug>' .. name
-    callback = (callback ~= nil and ', ' .. "'" ..  callback .. "'" or '')
-    local action = (context == M.context.init and '' or '<cmd>call ')
-        .. 'v:lua.kommentary.go(' .. context .. callback .. ')'
+    local action = (default_options["expr"] == true and '' or '<cmd>call ')
+        .. 'v:lua.kommentary.go(' .. context .. ',' .. '"' .. name .. '"' .. ')'
         .. (default_options["expr"] == true and '' or '<cr>')
+    name = '<Plug>' .. name
     vim.api.nvim_set_keymap(mode, name, action, default_options)
 end
 
@@ -90,31 +89,29 @@ end
 Set up keymappings.
 ]]
 function M.setup()
-    -- This is the global variable holding the callback function to be called by go()
-    vim.api.nvim_set_var("kommentary_callback_function", nil)
     --[[ The naming convention for these keymappings is: <Plug>kommentary_mode_suffix
     where suffix is either default, if it's the default behaviour, or a keyword
     indicating what is special about this mapping, for example consider the
     mapping `<Plug>kommentary_visual_singles`, this is a mapping for visual mode
     which will always use single-line comment style, instead of the default,
     which would be multi-line comment-style if the range is longer than one line. ]]
-    M.add_keymap("n", "kommentary_motion_default", M.context.init, { expr = true })
-    M.add_keymap("n", "kommentary_line_default", M.context.line)
+    M.add_keymap("n", "kommentary_motion_default", M.context.motion, { expr = true })
+    M.add_keymap("n", "kommentary_line_default", M.context.line, { expr = true })
     M.add_keymap("x", "kommentary_visual_default", M.context.visual)
     -- Increase comment level
-    M.add_keymap("n", "kommentary_motion_increase", M.context.init, { expr = true },
-        "kommentary.increase_comment_level")
-    M.add_keymap("n", "kommentary_line_increase", M.context.line, {},
-        "kommentary.increase_comment_level")
+    M.add_keymap("n", "kommentary_motion_increase", M.context.motion, { expr = true },
+        callbacks.increase_comment_level)
+    M.add_keymap("n", "kommentary_line_increase", M.context.line, { expr = true },
+        callbacks.increase_comment_level)
     M.add_keymap("x", "kommentary_visual_increase", M.context.visual, {},
-        "kommentary.increase_comment_level")
+        callbacks.increase_comment_level)
     -- Decrease comment level
-    M.add_keymap("n", "kommentary_motion_decrease", M.context.init, { expr = true },
-        "kommentary.decrease_comment_level")
-    M.add_keymap("n", "kommentary_line_decrease", M.context.line, {},
-        "kommentary.decrease_comment_level")
+    M.add_keymap("n", "kommentary_motion_decrease", M.context.motion, { expr = true },
+        callbacks.decrease_comment_level)
+    M.add_keymap("n", "kommentary_line_decrease", M.context.line, { expr = true },
+        callbacks.decrease_comment_level)
     M.add_keymap("x", "kommentary_visual_decrease", M.context.visual, {},
-        "kommentary.decrease_comment_level")
+        callbacks.decrease_comment_level)
 
   --[[ If the user has set the g:kommentary_create_default_mappings variable,
    use that value, otherwise default to creating the mappings ]]
