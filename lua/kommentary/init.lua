@@ -35,6 +35,9 @@ will do one of two things -
     comment out and not return anything.
 ]]
 function M.go(...)
+    if not vim.bo.modifiable then
+      return
+    end
     local args = {...}
     --[[ The first argument passed to this function represents one of 3 possible
     contexts in which this function can be called - linewise, motion or visual. The
