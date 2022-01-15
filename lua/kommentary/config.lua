@@ -313,16 +313,18 @@ function M.get_config(filetype)
             and M.config_from_commentstring(vim.bo.commentstring) or M.get_default_config()
     end
 
-    local hook = result[7]
-    if hook ~= nil then
-        hook()
-    end
     -- Fill in missing or "default" fields
-    for i = 1,6,1 do
+    for i = 1,7,1 do
         if result[i] == "default" or result[i] == nil then
             result[i] = M.get_default_config()[i]
         end
     end
+
+    local hook = result[7]
+    if hook ~= nil then
+        hook()
+    end
+
     if result[1] == "auto" then
         result[1] = M.config_from_commentstring(vim.bo.commentstring)[1]
     end
