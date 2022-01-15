@@ -302,18 +302,20 @@ function M.get_config(filetype)
     if filetype == 0 then
         filetype = vim.bo.filetype
     end
+
     local result = nil
     if M.has_filetype(filetype) then
-        hook = M.config[filetype][7]
-        if hook ~= nil then
-            hook()
-        end
         result = {unpack(M.config[filetype])}
     else
         --[[ We can't get the commentstring for a filetype different from the
         current buffer, so in that case always return the default ]]
         result = filetype == vim.bo.filetype
             and M.config_from_commentstring(vim.bo.commentstring) or M.get_default_config()
+    end
+
+    local hook = result[7]
+    if hook ~= nil then
+        hook()
     end
     -- Fill in missing or "default" fields
     for i = 1,6,1 do
