@@ -27,7 +27,7 @@ Plug 'b3nj5m1n/kommentary'
 
 ### Default Keybindings
 
-The default keybindings are the same as in vim-commentary. That means you an toggle comments for the current line using gcc, for the current visual selection using gc, and in combination with a motion using gc, for example gc5j.
+The default keybindings are the same as in vim-commentary. That means you can toggle comments for the current line using gcc, for the current visual selection using gc, and in combination with a motion using gc, for example gc5j.
 
 There's also some more advanced mappings which you can activate if you put this in your init.lua:
 
