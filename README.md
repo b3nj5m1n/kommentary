@@ -2,7 +2,7 @@
 
 Neovim plugin to comment text in and out, written in lua. Supports commenting out the current line, a visual selection and a motion.
 
-![](https://s2.gifyu.com/images/Peek-2021-01-30-23-12.gif)
+![](https://s10.gifyu.com/images/Peek-2021-01-30-23-12.gif)
 
 ## Getting started
 
