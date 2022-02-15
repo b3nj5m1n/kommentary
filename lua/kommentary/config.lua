@@ -98,6 +98,8 @@ function M.setup()
     M.add_keymap("n", "kommentary_motion_default", M.context.motion, { expr = true })
     M.add_keymap("n", "kommentary_line_default", M.context.line, { expr = true })
     M.add_keymap("x", "kommentary_visual_default", M.context.visual)
+    M.add_keymap("x", "kommentary_visual_singles", M.context.visual,{},
+    callbacks.multicomment_single)
     -- Increase comment level
     M.add_keymap("n", "kommentary_motion_increase", M.context.motion, { expr = true },
         callbacks.increase_comment_level)
