@@ -98,8 +98,6 @@ function M.setup()
     M.add_keymap("n", "kommentary_motion_default", M.context.motion, { expr = true })
     M.add_keymap("n", "kommentary_line_default", M.context.line, { expr = true })
     M.add_keymap("x", "kommentary_visual_default", M.context.visual)
-    M.add_keymap("x", "kommentary_visual_singles", M.context.visual,{},
-    callbacks.multicomment_single)
     -- Increase comment level
     M.add_keymap("n", "kommentary_motion_increase", M.context.motion, { expr = true },
         callbacks.increase_comment_level)
@@ -114,6 +112,11 @@ function M.setup()
         callbacks.decrease_comment_level)
     M.add_keymap("x", "kommentary_visual_decrease", M.context.visual, {},
         callbacks.decrease_comment_level)
+    -- Single line comments
+    M.add_keymap("n", "kommentary_motion_singles", M.context.motion, { expr = true },
+        callbacks.multicomment_single)
+    M.add_keymap("x", "kommentary_visual_singles", M.context.visual, {},
+        callbacks.multicomment_single)
 
   --[[ If the user has set the g:kommentary_create_default_mappings variable,
    use that value, otherwise default to creating the mappings ]]
