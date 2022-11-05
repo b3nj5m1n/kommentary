@@ -4,6 +4,16 @@ Neovim plugin to comment text in and out, written in lua. Supports commenting ou
 
 ![](https://s10.gifyu.com/images/Peek-2021-01-30-23-12.gif)
 
+## Note
+
+Unfortunately, **I will not be adding any more features to kommentary**. I'll do my best to fix any problems, should they occur in the future.
+
+There are several reasons for this decision, first and foremost, the codebase is really not fun to work on anymore and badly needs a rewrite. There are basially no unit tests, and some of the documentation is outdated. The whole structure is flawed, so implementing new features is a pain.
+
+There's also a new plugin called [Comment.nvim](https://github.com/numToStr/Comment.nvim), it's also written entirely in lua, it seems to support everything kommentary supports, in addition to dot (`.`) repeat and operating on parts of a line instead of the whole line. It has significantly more contributors and seems to be actively developed. Sadly, this also seems to make kommentary obsolete.
+
+Thanks to everyone who has contributed over the course of the last 2 years. ✌️
+
 ## Getting started
 
 ### Requirements
