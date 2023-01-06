@@ -48,6 +48,7 @@ M.config = {
     ["clojure"] = {";", {"(comment ", " )"}},
     ["cpp"] = {},
     ["cs"] = {},
+    ["dosbatch"] = {"REM", false},
     ["elixir"] = {"#", false, true},
     ["fennel"] = {";", false},
     ["go"] = {},
